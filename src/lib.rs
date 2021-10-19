@@ -10,16 +10,7 @@ pub use embedded_time;
 
 use prelude::*;
 
-/// The `EmbeddedTrace` struct. :shrugs:
-// pub struct EmbeddedTrace<C, W>
-// where
-//     C: Clock,
-//     W: Write,
-// {
-//     clock: C,
-//     writer: W,
-// }
-
+/// A trace duration that has been recorded.
 pub struct EmbeddedTraceDuration<T: embedded_time::TimeInt> {
     /// The name of this trace
     pub name: &'static str,
@@ -94,6 +85,6 @@ mod test {
         let start = et.start_snapshot();
         let sn = et.end_snapshot(start, "basic_snapshot");
 
-        mock::ET::borrow_writer(|writer| write!(writer, "{}\n", sn).unwrap());
+        mock::ET::borrow_writer(|writer| writeln!(writer, "{}", sn).unwrap());
     }
 }
