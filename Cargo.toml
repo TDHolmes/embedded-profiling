@@ -1,5 +1,5 @@
 [package]
-name = "embedded-trace"
+name = "embedded-profiling"
 version = "0.1.0"
 edition = "2018"
 
