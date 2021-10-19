@@ -43,8 +43,15 @@ where
     /// Gets the singleton instance of `EmbeddedTrace`.
     fn get() -> &'static Self;
 
-    /// Derp
-    fn get_writer() -> &'static mut W;
+    /// Mutably borrow a writer to write out the snapshot
+    ///
+    /// # Safety
+    ///
+    /// The implementer must safely guarantee that this writer can be used
+    /// mutably. E.g., behind a mutex.
+    fn borrow_writer<T, R>(borrower: T) -> R
+    where
+        T: Fn(&mut W) -> R;
 
     /// Takes a reading from the clock
     fn read_clock(&self) -> embedded_time::Instant<C>;
@@ -117,13 +124,20 @@ mod test {
             })
         }
 
-        fn get_writer() -> &'static mut Stdout {
+        fn borrow_writer<T, R>(borrower: T) -> R
+        where
+            T: Fn(&mut Stdout) -> R,
+        {
+            // SAFETY: `borrow_writer` never called in interrupt context and only
+            // ever used here. Therefore, we're always guaranteed that this is
+            // the only mutable borrow that ever exists, and it only happens once
+            // at a time.
             unsafe {
                 if ET_WRITER.is_none() {
                     ET_WRITER = Some(Stdout::new());
                 }
 
-                ET_WRITER.as_mut().unwrap()
+                borrower(ET_WRITER.as_mut().unwrap())
             }
         }
 
@@ -139,6 +153,6 @@ mod test {
         let start = et.start_snapshot();
         let sn = et.end_snapshot(start, "basic_snapshot");
 
-        write!(ET::get_writer(), "{}\n", sn).unwrap();
+        ET::borrow_writer(|writer| write!(writer, "{}\n", sn).unwrap());
     }
 }
