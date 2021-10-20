@@ -2,7 +2,7 @@
 #![no_main]
 
 use embedded_profiling_examples as epe;
-use epe::{bsp, hal, usb_serial, usb_serial_log};
+use epe::{bsp, hal, usb_serial, usb_serial_log, prelude::*};
 
 use core::f32;
 use hal::clock::GenericClockController;
@@ -13,7 +13,6 @@ use dwt_systick_monotonic as dsm;
 use embedded_profiling as ep;
 use ep::embedded_time::Clock;
 use panic_halt as _;
-use rtic_monotonic::Monotonic;
 
 const CORE_FREQ: u32 = 120_000_000;
 
