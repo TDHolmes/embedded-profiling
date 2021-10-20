@@ -2,7 +2,7 @@
 #![no_main]
 
 use embedded_profiling_examples as epe;
-use epe::{bsp, hal, usb_serial, usb_serial_log, prelude::*};
+use epe::{bsp, hal, prelude::*, usb_serial, usb_serial_log};
 
 use core::f32;
 use hal::clock::GenericClockController;
@@ -123,8 +123,7 @@ fn main() -> ! {
         EP_SYSTICK_INSTANCE = Some(EPSystick { timer: dwt_systic });
     }
 
-    // Simple loop that blinks the red led with random on and off times that are
-    // sourced from the random number generator.
+    // Loop and profile our pi approximation math
     let et = EPSystick::get();
     loop {
         let start = et.start_snapshot();
