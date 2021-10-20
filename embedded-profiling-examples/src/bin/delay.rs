@@ -22,51 +22,6 @@ const CORE_FREQ: u32 = 120_000_000;
 /// Shared atomic between RTC interrupt and sleeping_delay module
 static INTERRUPT_FIRED: atomic::AtomicBool = atomic::AtomicBool::new(false);
 
-// some math functions...
-
-fn factorial(num: f32) -> f32 {
-    let mut result = 1_f32;
-    for i in 2..(num as usize) {
-        result *= i as f32;
-    }
-    result
-}
-
-fn powf(input: f32, mut exp: f32) -> f32 {
-    if input == 0. || exp == 0. {
-        return 1.;
-    }
-
-    let mut output = input;
-    exp -= 1.;
-    while exp > 0. {
-        output *= input;
-        exp -= 1.;
-    }
-    output
-}
-
-fn calculate_pi_ramanujan(iterations: usize) -> f32 {
-    let mult: f32 = (2. * core::f32::consts::SQRT_2) / 9801.;
-    let mut sum = 0.;
-
-    // using a for loop requires const_for & const_mut_refs features
-    //   and still didn't seem to work with a range
-    let mut current_iteration = 0;
-    while current_iteration != iterations {
-        let k = current_iteration as f32;
-        let numerator = factorial(4. * k) * (1103. + 26390. * k);
-        let denominator = powf(factorial(k), 4.) * powf(396_f32, 4. * k);
-
-        sum += numerator / denominator;
-        current_iteration += 1;
-    }
-
-    1. / (sum * mult)
-}
-
-// our embedded-profiling struct & main
-
 struct EPSystick {
     pub timer: dsm::DwtSystick<CORE_FREQ>,
 }
