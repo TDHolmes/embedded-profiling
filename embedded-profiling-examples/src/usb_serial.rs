@@ -97,6 +97,14 @@ impl<'a> UsbSerial<'a> {
     }
 }
 
+impl<'a> core::fmt::Write for UsbSerial<'a> {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        self.write_str(s);
+
+        Ok(())
+    }
+}
+
 /// Initializes our global singleton
 pub fn init(nvic: &mut NVIC, usb_allocator: UsbBusAllocator<UsbBus>) {
     UsbSerial::init(nvic, usb_allocator);
@@ -123,7 +131,7 @@ pub fn user_present() -> bool {
 /// we will panic.
 pub fn get<T, R>(borrower: T) -> R
 where
-    T: Fn(&mut UsbSerial) -> R,
+    T: Fn(&'static mut UsbSerial) -> R,
 {
     usb_free(|_| unsafe {
         let usb_serial = USB_SERIAL.as_mut().expect("UsbSerial not initialized");
@@ -172,9 +180,9 @@ macro_rules! serial_write {
     ($($tt:tt)+) => {{
         use core::fmt::Write;
 
-        let mut s: heapless::String<64> = heapless::String::new();
-        core::write!(&mut s, $($tt)*).unwrap();
-        crate::usb_serial::get(|usbserial| { usbserial.write_str(s.as_str()); });
+        // let mut s: heapless::String<64> = heapless::String::new();
+        // core::write!(&mut s, $($tt)*).unwrap();
+        crate::usb_serial::get(|usbserial| { core::write!(usbserial, $($tt)*).unwrap() });
     }};
 }
 

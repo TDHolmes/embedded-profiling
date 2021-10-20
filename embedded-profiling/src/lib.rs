@@ -28,11 +28,12 @@ where
 }
 
 /// derp
-pub trait EmbeddedTrace<C, W>
-where
-    C: Clock,
-    W: Write,
-{
+pub trait EmbeddedTrace {
+    /// Derp
+    type ETClock: Clock;
+    /// Derp
+    type Writer: Write;
+
     /// Gets the singleton instance of `EmbeddedTrace`.
     fn get() -> &'static Self;
 
@@ -44,29 +45,31 @@ where
     /// mutably. E.g., behind a mutex.
     fn borrow_writer<T, R>(borrower: T) -> R
     where
-        T: Fn(&mut W) -> R;
+        T: Fn(&mut Self::Writer) -> R;
 
     /// Takes a reading from the clock
-    fn read_clock(&self) -> embedded_time::Instant<C>;
+    fn read_clock(&self) -> embedded_time::Instant<Self::ETClock>;
 
     /// takes the starting snapshot of a specific trace
-    fn start_snapshot(&self) -> embedded_time::Instant<C> {
+    fn start_snapshot(&self) -> embedded_time::Instant<Self::ETClock> {
         self.read_clock()
     }
 
     /// computes the duration of the snapshot given the start time
     fn end_snapshot(
         &self,
-        start_snapshot: embedded_time::Instant<C>,
+        start_snapshot: embedded_time::Instant<Self::ETClock>,
         snapshot_name: &'static str,
-    ) -> EmbeddedTraceDuration<C::T>
+    ) -> EmbeddedTraceDuration<<<Self as EmbeddedTrace>::ETClock as Clock>::T>
 where {
         use core::convert::TryInto;
 
         let snap = self.read_clock();
         let duration = snap - start_snapshot;
 
-        let micros: embedded_time::duration::Nanoseconds<C::T> = duration.try_into().unwrap();
+        let micros: embedded_time::duration::Nanoseconds<
+            <<Self as EmbeddedTrace>::ETClock as Clock>::T,
+        > = duration.try_into().unwrap();
         EmbeddedTraceDuration {
             name: snapshot_name,
             duration: micros,

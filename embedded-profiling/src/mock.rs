@@ -32,7 +32,10 @@ pub struct ET {
 static ET_INSTANCE: OnceCell<ET> = OnceCell::new();
 static mut ET_WRITER: Option<Stdout> = None;
 
-impl EmbeddedTrace<std_embedded_time::StandardClock, Stdout> for ET {
+impl EmbeddedTrace for ET {
+    type ETClock = std_embedded_time::StandardClock;
+    type Writer = Stdout;
+
     fn get() -> &'static Self {
         ET_INSTANCE.get_or_init(|| ET {
             clock: std_embedded_time::StandardClock::default(),
