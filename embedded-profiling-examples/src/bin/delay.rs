@@ -15,7 +15,10 @@ use cortex_m::peripheral::NVIC;
 use dwt_systick_monotonic as dsm;
 use embedded_profiling as ep;
 use ep::embedded_time::Clock;
+#[cfg(not(feature = "panic_persist"))]
 use panic_halt as _;
+#[cfg(feature = "panic_persist")]
+use panic_persist;
 
 const CORE_FREQ: u32 = 120_000_000;
 
@@ -33,7 +36,7 @@ impl embedded_profiling::EmbeddedTrace for EPSystick {
     type Writer = usb_serial::UsbSerial<'static>;
 
     fn get() -> &'static Self {
-        // you must initialize!
+        // you must initialize before doing any profiling!
         unsafe { EP_SYSTICK_INSTANCE.as_ref().unwrap() }
     }
 
@@ -68,7 +71,7 @@ fn main() -> ! {
 
     // enable interrupts
     unsafe {
-        core.NVIC.set_priority(interrupt::RTC, 2);
+        core.NVIC.set_priority(interrupt::RTC, 255);
         NVIC::unmask(interrupt::RTC);
     }
 
@@ -87,10 +90,25 @@ fn main() -> ! {
     usb_serial_log::init().ok();
 
     while !usb_serial::user_present() {
-        cortex_m::asm::wfi();
+        red_led.toggle().unwrap();
+        sleeping_delay.delay_ms(1000_u32);
+    }
+
+    // Check if there was a panic message, if so, print it out
+    #[cfg(feature = "panic_persist")]
+    if let Some(msg) = panic_persist::get_panic_message_bytes() {
+        log::error!("panic from previous boot:");
+        let mut bytes_written = 0;
+        // Write it out in chunks, waiting for USB interrupt handler to run in between before trying to shove more bytes
+        while bytes_written != msg.len() {
+            let chunk_written = usb_serial::get(|usbserial| usbserial.write(&msg[bytes_written..]));
+            bytes_written += chunk_written;
+            cortex_m::asm::wfi();
+        }
     }
 
     // initialize our profiling timer & structure
+    log::debug!("initializing our tracing stuff");
     let mut dwt_systic =
         dsm::DwtSystick::<CORE_FREQ>::new(&mut core.DCB, core.DWT, core.SYST, CORE_FREQ);
     unsafe {
@@ -103,6 +121,7 @@ fn main() -> ! {
     // // Loop and profile our pi approximation math
     let et = EPSystick::get();
     loop {
+        // log::debug!("loop");
         let start = et.start_snapshot();
         red_led.toggle().unwrap();
         sleeping_delay.delay_ms(250_u32);

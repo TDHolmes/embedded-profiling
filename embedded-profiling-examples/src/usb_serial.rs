@@ -39,8 +39,8 @@ impl<'a> UsbSerial<'a> {
         let usb_serial = SerialPort::new(usb_allocator);
         let usb_dev = UsbDeviceBuilder::new(usb_allocator, UsbVidPid(0x16c0, 0x27dd))
             .manufacturer("embedded-profiling")
-            .product("examples")
-            .serial_number("EPE")
+            .product("EP-example")
+            .serial_number("EP1")
             .device_class(USB_CLASS_CDC)
             .build();
 
@@ -62,9 +62,12 @@ impl<'a> UsbSerial<'a> {
     /// Polls the USB device and reads out any available serial data.
     ///
     /// To be called in the `USB` interrupt handler.
-    pub fn poll(&mut self, read_buffer: &mut [u8]) -> usize {
+    pub fn poll(&mut self) -> bool {
+        self.usb_dev.poll(&mut [&mut self.usb_serial])
+    }
+
+    pub fn poll_serial(&mut self, read_buffer: &mut [u8]) -> usize {
         let mut total_bytes_read = 0;
-        self.usb_dev.poll(&mut [&mut self.usb_serial]);
 
         if let Ok(bytes_read) = self.usb_serial.read(read_buffer) {
             total_bytes_read = bytes_read;
@@ -165,7 +168,7 @@ where
 /// Writes the given message out over USB serial.
 ///
 /// # Arguments
-/// * println args: variable arguments passed along to `ufmt::uwrite!`
+/// * println args: variable arguments passed along to `core::write!`
 ///
 /// # Warning
 /// as this function deals with a static mut, and it is also accessed in the
@@ -180,28 +183,24 @@ macro_rules! serial_write {
     ($($tt:tt)+) => {{
         use core::fmt::Write;
 
-        // let mut s: heapless::String<64> = heapless::String::new();
-        // core::write!(&mut s, $($tt)*).unwrap();
         crate::usb_serial::get(|usbserial| { core::write!(usbserial, $($tt)*).unwrap() });
     }};
 }
 
 fn poll_usb() {
-    let mut buf = [0u8; 64];
     // Safety:
     // `USB_SERIAL`:
     // Only interrupt handler that accesses it. thread access is only done
     // while interrupts are disabled.
-    //
-    // `CLI_INPUT_PRODUCER`:
-    // This is the only spot that we mutate it. When we initialize it to `Some()`,
-    // interrupts are disabled so this handler cannot run.
     unsafe {
         if let Some(serial) = USB_SERIAL.as_mut() {
-            let bytes_read = serial.poll(&mut buf);
-            // serial.write(&buf[0..bytes_read]);
-            if bytes_read != 0 {
-                USER_PRESENT.store(true, atomic::Ordering::Release);
+            let data_available = serial.poll();
+            if data_available {
+                let mut buf = [0u8; 1024];
+                let bytes_read = serial.poll_serial(&mut buf);
+                if bytes_read != 0 {
+                    USER_PRESENT.store(true, atomic::Ordering::Release);
+                }
             }
         }
     }
