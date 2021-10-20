@@ -28,26 +28,11 @@ jobs:
     - name: Checkout Sources
       uses: actions/checkout@v2
 
-    - name: Build embedded-profiling
-      run: |
-        cd ./embedded-profiling/
-        cargo build --all-features
+    - name: Build
+      run: cargo build --all-features
 
-    - name: embedded-profiling clippy
+    - name: Clippy
       uses: actions-rs/clippy-check@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        args: --manifest-path ./embedded-profiling/Cargo.toml
         name: embedded-profiling Clippy
-
-    - name: Build embedded-profiling-examples
-      run: |
-        cd ./embedded-profiling-examples/
-        cargo build --all-features
-
-    - name: embedded-profiling-examples clippy
-      uses: actions-rs/clippy-check@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        args: --manifest-path ./embedded-profiling-examples/Cargo.toml --target thumbv7em-none-eabihf
-        name: embedded-profiling-examples Clippy

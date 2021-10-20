@@ -1,7 +1,10 @@
+cargo-features = ["per-package-target"]
+
 [package]
 name = "embedded-profiling-examples"
 version = "0.1.0"
 edition = "2018"
+forced-target = "thumbv7em-none-eabihf"
 
 [dependencies]
 embedded-profiling = { path = "../embedded-profiling" }

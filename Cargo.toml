@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "embedded-profiling",
+    "embedded-profiling-proc-macros",
+    "embedded-profiling-examples",
+]
