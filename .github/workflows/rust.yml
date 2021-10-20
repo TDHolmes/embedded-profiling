@@ -29,7 +29,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build embedded-profiling
-      run: cargo build --manifest-path ./embedded-profiling/Cargo.toml --all-features
+      run: |
+        cd ./embedded-profiling/
+        cargo build --all-features
 
     - name: embedded-profiling clippy
       uses: actions-rs/clippy-check@v1
@@ -39,7 +41,9 @@ jobs:
         name: embedded-profiling Clippy
 
     - name: Build embedded-profiling-examples
-      run: cargo build --manifest-path ./embedded-profiling-examples/Cargo.toml --all-features
+      run: |
+        cd ./embedded-profiling-examples/
+        cargo build --all-features
 
     - name: embedded-profiling-examples clippy
       uses: actions-rs/clippy-check@v1
