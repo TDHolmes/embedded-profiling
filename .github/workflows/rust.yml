@@ -49,5 +49,5 @@ jobs:
       uses: actions-rs/clippy-check@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        args: --manifest-path ./embedded-profiling-examples/Cargo.toml
+        args: --manifest-path ./embedded-profiling-examples/Cargo.toml --target thumbv7em-none-eabihf
         name: embedded-profiling-examples Clippy
