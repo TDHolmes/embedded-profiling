@@ -125,8 +125,13 @@ fn main() -> ! {
 
     // Simple loop that blinks the red led with random on and off times that are
     // sourced from the random number generator.
+    let et = EPSystick::get();
     loop {
+        let start = et.start_snapshot();
         red_led.toggle().unwrap();
         calculate_pi_ramanujan(500);
+        let sn = et.end_snapshot(start, "calculate_pi_ramanujan");
+
+        EPSystick::borrow_writer(|writer| writeln!(writer, "{}", sn).unwrap());
     }
 }
