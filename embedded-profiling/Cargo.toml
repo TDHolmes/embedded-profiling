@@ -6,8 +6,7 @@ edition = "2018"
 [dependencies]
 embedded-time = "0.12"
 cortex-m = "0.7"
-
-feather_m4 = { git = "https://github.com/atsamd-rs/atsamd/", features = ["usb", "unproven", "rt"], optional = true }
+embedded-profiling-proc-macros = { path = "../embedded-profiling-proc-macros", version = "0.1" }
 
 [dev-dependencies]
 once_cell = "1.0"

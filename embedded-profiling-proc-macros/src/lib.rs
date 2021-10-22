@@ -7,8 +7,8 @@ use syn::{parse_macro_input, parse_quote, ItemFn};
 #[proc_macro_attribute]
 pub fn profile(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut function = parse_macro_input!(item as ItemFn);
-    // let input_struct = proc_macro2::TokenStream::from(attr);
-    let input_struct = parse_macro_input!(attr as syn::ItemStatic);
+    let input_struct = proc_macro2::TokenStream::from(attr);
+    // let input_struct = parse_macro_input!(attr as syn::ItemStatic);
     let instrumented_function_name = function.sig.ident.to_string();
 
     let body = &function.block;

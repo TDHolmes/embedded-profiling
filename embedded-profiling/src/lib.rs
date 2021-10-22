@@ -8,6 +8,7 @@ mod prelude;
 
 pub use embedded_time;
 
+use embedded_profiling_proc_macros::profile;
 use prelude::*;
 
 /// A trace duration that has been recorded.
@@ -83,6 +84,17 @@ mod test {
 
     #[test]
     fn basic_snapshot() {
+        let et = mock::ET::get();
+
+        let start = et.start_snapshot();
+        let sn = et.end_snapshot(start, "basic_snapshot");
+
+        mock::ET::borrow_writer(|writer| writeln!(writer, "{}", sn).unwrap());
+    }
+
+    #[test]
+    #[profile(mock::ET)]
+    fn proc_macro_snapshot() {
         let et = mock::ET::get();
 
         let start = et.start_snapshot();
