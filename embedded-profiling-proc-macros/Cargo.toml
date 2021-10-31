@@ -1,7 +1,8 @@
 [package]
 name = "embedded-profiling-proc-macros"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
+repository = "https://github.com/TDHolmes/embedded-profiling"
 keywords = ["performance", "profiling", "no-std"]
 categories = ["development-tools::profiling"]
 

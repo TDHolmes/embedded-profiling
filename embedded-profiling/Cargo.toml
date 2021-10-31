@@ -1,7 +1,11 @@
 [package]
 name = "embedded-profiling"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
+readme = "../README.md"
+repository = "https://github.com/TDHolmes/embedded-profiling"
+keywords = ["performance", "profiling", "no-std"]
+categories = ["development-tools::profiling", "embedded"]
 
 [dependencies]
 log = "0.4"
