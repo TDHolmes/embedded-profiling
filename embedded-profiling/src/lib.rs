@@ -44,6 +44,7 @@
 
 use core::sync::atomic::{AtomicU8, Ordering};
 
+pub mod dwt_systick;
 #[cfg(test)]
 mod mock;
 
@@ -61,7 +62,7 @@ pub type EPContainer = u32;
 pub type EPContainer = u64;
 
 /// Our [`Duration`](fugit::Duration) type, representing time elapsed in microseconds
-pub type EPDuration = fugit::aliases::MicrosDuration<EPContainer>;
+pub type EPDuration = fugit::MicrosDuration<EPContainer>;
 
 /// Our [`Instant`](fugit::Instant) type, representing a snapshot in time from
 /// a clock with 1 µs precision (or at least, converted to this representation)
@@ -88,8 +89,14 @@ pub trait EmbeddedProfiler {
     /// Takes a reading from the clock
     fn read_clock(&self) -> EPInstant;
 
-    /// Log the snapshot to some output, like a serial port
-    fn log_snapshot(&self, snapshot: &EPSnapshot);
+    /// Optionally reset the clock to zero. This function will be called at the beginning of
+    /// [start_snapshot].
+    ///
+    /// TODO: not sure if this API is worth while or not.
+    fn reset_clock(&mut self) {}
+
+    /// Optionally log the snapshot to some output, like a serial port
+    fn log_snapshot(&self, _snapshot: &EPSnapshot) {}
 
     /// Optional function that gets called at the start of the snapshot recording
     fn at_start(&self) {}
@@ -98,16 +105,19 @@ pub trait EmbeddedProfiler {
     fn at_end(&self) {}
 
     /// takes the starting snapshot of a specific trace
-    fn start_snapshot(&self) -> EPInstant {
+    fn start_snapshot(&mut self) -> EPInstant {
+        self.reset_clock();
         self.at_start();
-        self.read_clock()
+        let start = self.read_clock();
+
+        start
     }
 
     /// computes the duration of the snapshot given the start time
     fn end_snapshot(&self, start: EPInstant, name: &'static str) -> EPSnapshot {
         self.at_end();
         let now = self.read_clock();
-        let duration = now - start;
+        let duration = now.checked_duration_since(start).unwrap();
 
         EPSnapshot { name, duration }
     }

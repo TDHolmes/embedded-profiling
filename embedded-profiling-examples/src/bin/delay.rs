@@ -2,7 +2,7 @@
 #![no_main]
 
 use embedded_profiling_examples as epe;
-use epe::{bsp, hal, prelude::*, usb_serial, usb_serial_log};
+use epe::{bsp, hal, usb_serial, usb_serial_log};
 
 use core::sync::atomic;
 use hal::clock::GenericClockController;
@@ -12,7 +12,6 @@ use hal::rtc;
 use hal::sleeping_delay::SleepingDelay;
 
 use cortex_m::peripheral::NVIC;
-use dwt_systick_monotonic as dsm;
 use embedded_profiling as ep;
 #[cfg(not(feature = "panic_persist"))]
 use panic_halt as _;
@@ -24,11 +23,7 @@ const CORE_FREQ: u32 = 120_000_000;
 /// Shared atomic between RTC interrupt and sleeping_delay module
 static INTERRUPT_FIRED: atomic::AtomicBool = atomic::AtomicBool::new(false);
 
-struct EPSystick {
-    pub timer: dsm::DwtSystick<CORE_FREQ>,
-}
-
-static mut EP_SYSTICK_INSTANCE: Option<EPSystick> = None;
+static mut EP_SYSTICK_INSTANCE: Option<ep::dwt_systick::DwtSystick<CORE_FREQ>> = None;
 
 #[bsp::entry]
 fn main() -> ! {
@@ -86,29 +81,26 @@ fn main() -> ! {
     }
 
     // initialize our profiling timer & structure
-    // log::debug!("initializing our tracing stuff");
-    // let mut dwt_systick =
-    //     dsm::DwtSystick::<CORE_FREQ>::new(&mut core.DCB, core.DWT, core.SYST, CORE_FREQ);
-    // unsafe {
-    //     dwt_systick.reset();
-    // }
-    // unsafe {
-    //     EP_SYSTICK_INSTANCE = Some(EPSystick { timer: dwt_systick });
-    // }
+    log::debug!("initializing our tracing stuff");
+    let dwt_systick = ep::dwt_systick::DwtSystick::<CORE_FREQ>::new(
+        &mut core.DCB,
+        core.DWT,
+        core.SYST,
+        CORE_FREQ,
+    );
+    unsafe {
+        EP_SYSTICK_INSTANCE = Some(dwt_systick);
+        ep::set_profiler(EP_SYSTICK_INSTANCE.as_ref().unwrap()).unwrap();
+    }
 
-    // // // Loop and profile our pi approximation math
-    // let et = EPSystick::get();
-    // loop {
-    //     // log::debug!("loop");
-    //     let start = et.start_snapshot();
-    //     red_led.toggle().unwrap();
-    //     sleeping_delay.delay_ms(250_u32);
-    //     let sn = et.end_snapshot(start, "delay_250ms");
-
-    //     EPSystick::borrow_writer(|writer| writeln!(writer, "{}", sn).unwrap());
-    // }
-
-    loop {}
+    // Loop and profile our pi approximation math
+    loop {
+        red_led.toggle().unwrap();
+        let start = ep::start_snapshot();
+        sleeping_delay.delay_ms(250_u32);
+        let sn = ep::end_snapshot(start, "delay_250ms");
+        ep::log_snapshot(&sn);
+    }
 }
 
 #[interrupt]

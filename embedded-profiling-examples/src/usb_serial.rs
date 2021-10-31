@@ -196,7 +196,7 @@ fn poll_usb() {
         if let Some(serial) = USB_SERIAL.as_mut() {
             let data_available = serial.poll();
             if data_available {
-                let mut buf = [0u8; 1024];
+                let mut buf = [0u8; 256];
                 let bytes_read = serial.poll_serial(&mut buf);
                 if bytes_read != 0 {
                     USER_PRESENT.store(true, atomic::Ordering::Release);
