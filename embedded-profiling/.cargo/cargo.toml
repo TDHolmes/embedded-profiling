@@ -1,0 +1,2 @@
+[package.metadata.docs.rs]
+features = ["proc-macros", "dwt-systick"]

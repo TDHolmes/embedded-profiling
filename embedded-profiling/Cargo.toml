@@ -1,7 +1,7 @@
 [package]
 name = "embedded-profiling"
 description = "Profiling for `no-std` embedded targets"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 repository = "https://github.com/TDHolmes/embedded-profiling"
 keywords = ["performance", "profiling", "no-std"]
