@@ -2,6 +2,7 @@
 #![no_main]
 
 use embedded_profiling_examples as epe;
+use epe::hal::rtc::Count32Mode;
 use epe::{bsp, hal, usb_serial, usb_serial_log};
 
 use core::sync::atomic;
@@ -96,11 +97,13 @@ fn main() -> ! {
     // Loop and profile our pi approximation math
     loop {
         red_led.toggle().unwrap();
-        let start = ep::start_snapshot();
-        sleeping_delay.delay_ms(250_u32);
-        let sn = ep::end_snapshot(start, "delay_250ms");
-        ep::log_snapshot(&sn);
+        profile_target(&mut sleeping_delay);
     }
+}
+
+#[ep::profile_function]
+fn profile_target(sleeping_delay: &mut SleepingDelay<rtc::Rtc<Count32Mode>>) {
+    sleeping_delay.delay_ms(250_u32);
 }
 
 #[interrupt]
