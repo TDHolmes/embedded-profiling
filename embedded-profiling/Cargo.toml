@@ -3,7 +3,6 @@ name = "embedded-profiling"
 description = "Profiling for `no-std` embedded targets"
 version = "0.1.0"
 edition = "2021"
-readme = "../README.md"
 repository = "https://github.com/TDHolmes/embedded-profiling"
 keywords = ["performance", "profiling", "no-std"]
 categories = ["development-tools::profiling", "embedded"]

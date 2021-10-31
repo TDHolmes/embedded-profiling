@@ -1,3 +1,4 @@
 # embedded-profiling
 
-Embedded Rust solution to profiling the runtime of functions.
+Solution to profiling the runtime of functions in embedded, `no-std` environments.
+[Documentation](https://docs.rs/embedded-profiling/)
