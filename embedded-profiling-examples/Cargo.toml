@@ -7,7 +7,7 @@ edition = "2021"
 forced-target = "thumbv7em-none-eabihf"
 
 [dependencies]
-embedded-profiling = { path = "../embedded-profiling", features = ["proc-macros"] }
+embedded-profiling = { path = "../embedded-profiling", features = ["proc-macros", "dwt-systick"] }
 feather_m4 = { git = "https://github.com/atsamd-rs/atsamd/", features = ["usb", "unproven", "rt"] }
 panic-persist = {version = "0.3", optional = true}
 panic-halt = "0.2"

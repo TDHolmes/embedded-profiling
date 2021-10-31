@@ -44,14 +44,14 @@
 
 use core::sync::atomic::{AtomicU8, Ordering};
 
+#[cfg(any(feature = "dwt-systick", doc))]
 pub mod dwt_systick;
 #[cfg(test)]
 mod mock;
+#[cfg(any(feature = "proc-macros", doc))]
+pub use embedded_profiling_proc_macros::profile_function;
 
 pub use fugit;
-
-#[cfg(feature = "proc-macros")]
-pub use embedded_profiling_proc_macros::profile_function;
 
 #[cfg(feature = "container-u32")]
 /// The underlying container of our [`Duration`](fugit::Duration)/[`Instant`](fugit::Instant) types
