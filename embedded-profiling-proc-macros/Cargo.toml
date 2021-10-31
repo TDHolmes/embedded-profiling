@@ -1,10 +1,12 @@
 [package]
 name = "embedded-profiling-proc-macros"
+description = "Procedural macros for the `embedded-profiling` library"
 version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/TDHolmes/embedded-profiling"
 keywords = ["performance", "profiling", "no-std"]
 categories = ["development-tools::profiling"]
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 quote = { version = "1.0", default-features = false }
