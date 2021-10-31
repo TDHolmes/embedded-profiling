@@ -98,7 +98,9 @@ pub trait EmbeddedProfiler {
     /// Optionally log the snapshot to some output, like a serial port
     fn log_snapshot(&self, _snapshot: &EPSnapshot) {}
 
-    /// Optional function that gets called at the start of the snapshot recording
+    /// Optional function that gets called at the start of the snapshot recording.
+    /// If one would want to very simple profiling, they could use `at_start` and `at_end`
+    /// to simply toggle a GPIO.
     fn at_start(&self) {}
 
     /// Optional function that gets called at the end of the snapshot recording
