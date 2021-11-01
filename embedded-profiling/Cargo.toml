@@ -25,4 +25,4 @@ container-u32 = []
 container-u64 = []
 
 [package.metadata.docs.rs]
-features = ["proc-macros", "dwt-systick"]
+all-features = true

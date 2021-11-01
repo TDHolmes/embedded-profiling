@@ -53,7 +53,8 @@ pub use embedded_profiling_proc_macros::profile_function;
 
 pub use fugit;
 
-#[cfg(feature = "container-u32")]
+// the `not(feature = "container-u64")` clause is so we can successfully use `--all-features`.
+#[cfg(all(feature = "container-u32", not(feature = "container-u64")))]
 /// The underlying container of our [`Duration`](fugit::Duration)/[`Instant`](fugit::Instant) types
 pub type EPContainer = u32;
 

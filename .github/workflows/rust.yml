@@ -32,11 +32,11 @@ jobs:
       run: RUSTFLAGS="-D warnings" cargo build
 
     - name: Build (all features)
-      run: RUSTFLAGS="-D warnings" cargo build --features="proc-macros,dwt-systick"
+      run: RUSTFLAGS="-D warnings" cargo build --all-features
 
     - name: Clippy
       uses: actions-rs/clippy-check@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: embedded-profiling Clippy
-        args: --features=proc-macros --features=dwt-systick -- -W clippy::pedantic -W clippy::nursery -W clippy::cargo -A clippy::must_use_candidate
+        args: --all-features -- -W clippy::pedantic -W clippy::nursery -W clippy::cargo -A clippy::must_use_candidate

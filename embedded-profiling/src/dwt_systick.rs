@@ -42,7 +42,7 @@ impl<const FREQ: u32> crate::EmbeddedProfiler for DwtSystick<FREQ> {
     fn read_clock(&self) -> crate::EPInstant {
         // TODO: fix this gross conversion
         crate::EPInstant::from_ticks(
-            (self.dwt.cyccnt.read() as u64 * 1_000_000_u64 / FREQ as u64) as u32,
+            (self.dwt.cyccnt.read() as u64 * 1_000_000_u64 / FREQ as u64) as crate::EPContainer,
         )
     }
 
