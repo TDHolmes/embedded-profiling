@@ -19,7 +19,7 @@ use panic_halt as _;
 
 const CORE_FREQ: u32 = 120_000_000;
 
-/// Shared atomic between RTC interrupt and sleeping_delay module
+/// Shared atomic between RTC interrupt and `sleeping_delay` module
 static INTERRUPT_FIRED: atomic::AtomicBool = atomic::AtomicBool::new(false);
 
 static mut EP_SYSTICK_INSTANCE: Option<ep::dwt_systick::DwtSystick<CORE_FREQ>> = None;

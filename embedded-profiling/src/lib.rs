@@ -3,7 +3,7 @@
 //! A lightweight framework for profiling functions, geared towards
 //! `no-std` embedded environments. Initialization is very similar
 //! to how the `log` crate is initialized. By default, there is a
-//! no-op profiler that does nothing until you call [set_profiler].
+//! no-op profiler that does nothing until you call [`set_profiler`].
 //! Once your profiler has been installed, your profiling
 //! functionality will be in use.
 //!
@@ -29,8 +29,8 @@
 //!
 //! With the `proc-macros` feature enabled, you can simply annotate
 //! the target function with the procedural macro
-//! [profile_function](embedded_profiling_proc_macros::profile_function).
-//! Note that you must first set your profiler with the [set_profiler]
+//! [`profile_function`](embedded_profiling_proc_macros::profile_function).
+//! Note that you must first set your profiler with the [`set_profiler`]
 //! function.
 //! ```
 //! # #[cfg(feature = "proc-macros")]
@@ -90,7 +90,7 @@ pub trait EmbeddedProfiler {
     fn read_clock(&self) -> EPInstant;
 
     /// Optionally reset the clock to zero. This function will be called at the beginning of
-    /// [start_snapshot].
+    /// [`start_snapshot`].
     ///
     /// TODO: not sure if this API is worth while or not.
     fn reset_clock(&mut self) {}
@@ -150,6 +150,9 @@ pub struct SetProfilerError;
 /// # Safety
 /// Must be completed with no other threads running
 /// or, in an embedded single core environment, with interrupts disabled.
+///
+/// # Errors
+/// returns `Err(SetProfilerError)` when a global profiler has already been configured
 pub unsafe fn set_profiler(
     profiler: &'static dyn EmbeddedProfiler,
 ) -> Result<(), SetProfilerError> {
@@ -177,7 +180,7 @@ pub fn end_snapshot(start: EPInstant, name: &'static str) -> EPSnapshot {
 
 /// Logs the given snapshot with the globally configured profiler
 pub fn log_snapshot(snapshot: &EPSnapshot) {
-    unsafe { PROFILER }.log_snapshot(snapshot)
+    unsafe { PROFILER }.log_snapshot(snapshot);
 }
 
 /// Profiles the given closure `target` with name `name`.

@@ -1,3 +1,7 @@
+//! Procedural macros for the [`embedded-profiling`] crate. Meant to only be accessed
+//! via that crate. See [`embedded-profiling`] for full documentation.
+//!
+//! [`embedded-profiling`]: https://docs.rs/embedded-profiling/
 extern crate proc_macro;
 use proc_macro::TokenStream;
 
