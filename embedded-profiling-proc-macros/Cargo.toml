@@ -11,7 +11,6 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 quote = { version = "1.0", default-features = false }
 syn = { version = "1.0", features = ["full"] }
-proc-macro2 = "1.0"
 
 [lib]
 proc-macro=true
