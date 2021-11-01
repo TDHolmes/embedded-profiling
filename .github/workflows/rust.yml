@@ -39,4 +39,4 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: embedded-profiling Clippy
-        args: --features="proc-macros,dwt-systick"
+        args: --features=proc-macros --features=dwt-systick

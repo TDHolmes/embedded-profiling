@@ -110,9 +110,7 @@ pub trait EmbeddedProfiler {
     fn start_snapshot(&mut self) -> EPInstant {
         self.reset_clock();
         self.at_start();
-        let start = self.read_clock();
-
-        start
+        self.read_clock()
     }
 
     /// computes the duration of the snapshot given the start time
@@ -147,8 +145,11 @@ static STATE: AtomicU8 = AtomicU8::new(UNINITIALIZED);
 #[derive(Debug)]
 pub struct SetProfilerError;
 
-/// Sets the profiler. Must be completed with no other threads running
-/// or, on an embedded single core environment, with interrupts disabled.
+/// Sets the global profiler.
+///
+/// # Safety
+/// Must be completed with no other threads running
+/// or, in an embedded single core environment, with interrupts disabled.
 pub unsafe fn set_profiler(
     profiler: &'static dyn EmbeddedProfiler,
 ) -> Result<(), SetProfilerError> {

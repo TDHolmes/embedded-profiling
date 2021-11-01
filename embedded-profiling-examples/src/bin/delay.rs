@@ -16,8 +16,6 @@ use cortex_m::peripheral::NVIC;
 use embedded_profiling as ep;
 #[cfg(not(feature = "panic_persist"))]
 use panic_halt as _;
-#[cfg(feature = "panic_persist")]
-use panic_persist;
 
 const CORE_FREQ: u32 = 120_000_000;
 
