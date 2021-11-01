@@ -44,23 +44,25 @@
 
 use core::sync::atomic::{AtomicU8, Ordering};
 
-#[cfg(any(feature = "dwt-systick", doc))]
+#[cfg(feature = "dwt-systick")]
 pub mod dwt_systick;
 #[cfg(test)]
 mod mock;
-#[cfg(any(feature = "proc-macros", doc))]
+#[cfg(feature = "proc-macros")]
 pub use embedded_profiling_proc_macros::profile_function;
 
 pub use fugit;
 
-// the `not(feature = "container-u64")` clause is so we can successfully use `--all-features`.
-#[cfg(all(feature = "container-u32", not(feature = "container-u64")))]
-/// The underlying container of our [`Duration`](fugit::Duration)/[`Instant`](fugit::Instant) types
-pub type EPContainer = u32;
+// do the feature gating on a private type so our public documentation is only in one place
+#[cfg(feature = "container-u32")]
+type PrivContainer = u32;
+#[cfg(all(feature = "container-u64", not(feature = "container-u32")))]
+type PrivContainer = u64;
 
-#[cfg(feature = "container-u64")]
-/// The underlying container of our [`Duration`](fugit::Duration)/[`Instant`](fugit::Instant) types
-pub type EPContainer = u64;
+// the `not(feature = "container-u32")` clause is so we can successfully use `--all-features`.
+/// The underlying container of our [`Duration`](fugit::Duration)/[`Instant`](fugit::Instant) types.
+/// Can be either `u32` or `u64`, depending on features. (default: `u32`)
+pub type EPContainer = PrivContainer;
 
 /// Our [`Duration`](fugit::Duration) type, representing time elapsed in microseconds
 pub type EPDuration = fugit::MicrosDuration<EPContainer>;
