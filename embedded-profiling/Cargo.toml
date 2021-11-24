@@ -9,7 +9,7 @@ categories = ["development-tools::profiling", "embedded"]
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-fugit = "0.2"
+fugit = "0.3"
 cortex-m = "0.7"
 log = {version = "0.4", optional = true}
 embedded-profiling-proc-macros = { path = "../embedded-profiling-proc-macros", version = "0.1", optional = true }
