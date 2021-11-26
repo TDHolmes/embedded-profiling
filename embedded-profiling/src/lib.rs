@@ -228,6 +228,7 @@ mod test {
     }
 
     #[test]
+    #[serial_test::serial]
     fn basic_duration() {
         let profiler = StdMockProfiler::default();
 
@@ -238,6 +239,7 @@ mod test {
     }
 
     #[test]
+    #[serial_test::serial]
     fn basic_duration_and_set_profiler() {
         // set the profiler, if it hasn't been already
         set_profiler();
@@ -249,6 +251,7 @@ mod test {
     }
 
     #[test]
+    #[serial_test::serial]
     fn profile_closure() {
         // set the profiler, if it hasn't been already
         set_profiler();
@@ -260,6 +263,7 @@ mod test {
 
     #[cfg(feature = "proc-macros")]
     #[test]
+    #[serial_test::serial]
     fn profile_proc_macro() {
         #[profile_function]
         fn delay_25ms() {

@@ -34,6 +34,12 @@ jobs:
     - name: Build (all features)
       run: RUSTFLAGS="-D warnings" cargo build --all-features
 
+    - name: test embedded-profiling
+      run: RUSTFLAGS="-D warnings" cargo test --manifest-path ./embedded-profiling/Cargo.toml
+
+    - name: test embedded-profiling-proc-macros
+      run: RUSTFLAGS="-D warnings" cargo test --manifest-path ./embedded-profiling-proc-macros/Cargo.toml
+
     - name: Clippy
       uses: actions-rs/clippy-check@v1
       with:

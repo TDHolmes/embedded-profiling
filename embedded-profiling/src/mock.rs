@@ -14,8 +14,6 @@ impl core::default::Default for StdMockProfiler {
 
 impl super::EmbeddedProfiler for StdMockProfiler {
     fn read_clock(&self) -> crate::EPInstant {
-        use std::convert::TryInto;
-
         let now = std::time::Instant::now();
         let elapsed = now.duration_since(self.start);
 
