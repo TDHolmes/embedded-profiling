@@ -230,7 +230,7 @@ mod test {
     #[test]
     #[serial_test::serial]
     fn basic_duration() {
-        let profiler = StdMockProfiler::default();
+        let mut profiler = StdMockProfiler::default();
 
         let start = profiler.start_snapshot();
         std::thread::sleep(std::time::Duration::from_millis(25));
