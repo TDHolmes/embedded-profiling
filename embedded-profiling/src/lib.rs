@@ -170,20 +170,31 @@ pub unsafe fn set_profiler(
     }
 }
 
+/// Returns a reference to the configured profiler
+#[inline(never)]
+pub fn profiler() -> &'static dyn EmbeddedProfiler {
+    if STATE.load(Ordering::Acquire) == INITIALIZED {
+        unsafe { PROFILER }
+    } else {
+        static NOP: NoopProfiler = NoopProfiler;
+        &NOP
+    }
+}
+
 /// takes the starting snapshot of a specific trace
 pub fn start_snapshot() -> EPInstant {
-    unsafe { PROFILER }.read_clock()
+    profiler().read_clock()
 }
 
 /// computes the duration of the snapshot given the start time using the
 /// globally configured profiler
 pub fn end_snapshot(start: EPInstant, name: &'static str) -> EPSnapshot {
-    unsafe { PROFILER }.end_snapshot(start, name)
+    profiler().end_snapshot(start, name)
 }
 
 /// Logs the given snapshot with the globally configured profiler
 pub fn log_snapshot(snapshot: &EPSnapshot) {
-    unsafe { PROFILER }.log_snapshot(snapshot);
+    profiler().log_snapshot(snapshot);
 }
 
 /// Profiles the given closure `target` with name `name`.
