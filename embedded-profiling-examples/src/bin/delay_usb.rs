@@ -28,6 +28,12 @@ static mut EP_SYSTICK_INSTANCE: Option<ep::dwt_systick::DwtSystick<CORE_FREQ>> =
 fn main() -> ! {
     let mut peripherals = Peripherals::take().unwrap();
     let mut core = CorePeripherals::take().unwrap();
+
+    unsafe {
+        // disable data and instruction caching
+        peripherals.CMCC.ctrl.write(|w| w.bits(0_u32));
+    }
+
     let mut clocks = GenericClockController::with_internal_32kosc(
         peripherals.GCLK,
         &mut peripherals.MCLK,
@@ -92,7 +98,7 @@ fn main() -> ! {
         ep::set_profiler(EP_SYSTICK_INSTANCE.as_ref().unwrap()).unwrap();
     }
 
-    // Loop and profile our pi approximation math
+    // Loop and profile our delay function
     loop {
         red_led.toggle().unwrap();
         profile_target(&mut sleeping_delay);
