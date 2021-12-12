@@ -10,18 +10,14 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 fugit = "0.3"
-cortex-m = "0.7"
-log = {version = "0.4", optional = true}
 embedded-profiling-proc-macros = { path = "../embedded-profiling-proc-macros", version = "0.1", optional = true }
 
 [dev-dependencies]
 serial_test = "0.5"
 
 [features]
-default = ["container-u32"]
+default = []
 proc-macros = ["embedded-profiling-proc-macros"]
-dwt-systick = ["log"]
-container-u32 = []
 container-u64 = []
 
 [package.metadata.docs.rs]

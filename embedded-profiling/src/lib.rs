@@ -44,8 +44,6 @@
 
 use core::sync::atomic::{AtomicU8, Ordering};
 
-#[cfg(feature = "dwt-systick")]
-pub mod dwt_systick;
 #[cfg(test)]
 mod mock;
 #[cfg(feature = "proc-macros")]
@@ -108,13 +106,13 @@ pub trait EmbeddedProfiler {
         self.read_clock()
     }
 
-    /// computes the duration of the snapshot given the start time
-    fn end_snapshot(&self, start: EPInstant, name: &'static str) -> EPSnapshot {
+    /// computes the duration of the snapshot given the start time, if there hasn't been overflow
+    ///
+    fn end_snapshot(&self, start: EPInstant, name: &'static str) -> Option<EPSnapshot> {
         self.at_end();
         let now = self.read_clock();
-        let duration = now.checked_duration_since(start).unwrap();
-
-        EPSnapshot { name, duration }
+        now.checked_duration_since(start)
+            .map(|duration| EPSnapshot { name, duration })
     }
 }
 
@@ -181,7 +179,8 @@ pub fn start_snapshot() -> EPInstant {
 
 /// computes the duration of the snapshot given the start time using the
 /// globally configured profiler
-pub fn end_snapshot(start: EPInstant, name: &'static str) -> EPSnapshot {
+#[inline]
+pub fn end_snapshot(start: EPInstant, name: &'static str) -> Option<EPSnapshot> {
     profiler().end_snapshot(start, name)
 }
 
@@ -204,9 +203,9 @@ where
 {
     let start = start_snapshot();
     let ret = target();
-    let snapshot = end_snapshot(start, name);
-
-    log_snapshot(&snapshot);
+    if let Some(snapshot) = end_snapshot(start, name) {
+        log_snapshot(&snapshot);
+    }
     ret
 }
 
@@ -251,8 +250,9 @@ mod test {
 
         let start = start_snapshot();
         std::thread::sleep(std::time::Duration::from_millis(25));
-        let end = end_snapshot(start, "basic_dur");
-        log_snapshot(&end);
+        if let Some(end) = end_snapshot(start, "basic_dur") {
+            log_snapshot(&end);
+        }
     }
 
     #[test]

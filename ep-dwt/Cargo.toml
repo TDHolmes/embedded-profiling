@@ -1,0 +1,20 @@
+[package]
+name = "ep-dwt"
+version = "0.1.0"
+edition = "2021"
+description = "`embedded-profiling` implementation using the Data Watchpoint and Tracing (DWT) unit"
+repository = "https://github.com/TDHolmes/embedded-profiling"
+keywords = ["performance", "profiling", "no-std"]
+categories = ["development-tools::profiling", "embedded"]
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+embedded-profiling = {version = "0.1", path = "../embedded-profiling"}
+cortex-m = "0.7"
+log = "0.4"
+
+cortex-m-rt = {version = "0.7", optional = true}
+static_assertions = {version = "1", optional = true}
+
+[features]
+extended = ["cortex-m-rt", "static_assertions", "embedded-profiling/container-u64"]

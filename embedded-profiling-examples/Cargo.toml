@@ -13,7 +13,10 @@ categories = ["development-tools::profiling"]
 readme = "# Embedded Profiling Examples"
 
 [dependencies]
-embedded-profiling = { path = "../embedded-profiling", features = ["proc-macros", "dwt-systick"] }
+embedded-profiling = { path = "../embedded-profiling", features = ["proc-macros"] }
+ep-pin-toggle = { path = "../ep-pin-toggle" }
+ep-dwt = { path = "../ep-dwt" }
+
 feather_m4 = { git = "https://github.com/atsamd-rs/atsamd/", features = ["usb", "unproven", "rt"] }
 panic-halt = "0.2"
 cortex-m = "0.7"

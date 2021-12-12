@@ -42,14 +42,11 @@ fn my_long_running_function() {
 }
 ```
 
-## Example Project & DWT Timer Implementation
+## Example Project & `EmbeddedProfiler` Implementations
 
 A working example program on a [`feather_m4`] development board is provided
 in the [`embedded-profiling` github repo](https://github.com/TDHolmes/embedded-profiling).
-The `embedded-profiling` library also provides a basic timer implementation
-using the DWT/systick functionality found in most Cortex-M microcontrollers.
-The implementation is heavily inspired (read: copied and lightly modified)
-from the `RTIC` [`dwt-systick-monotonic`](https://github.com/rtic-rs/dwt-systick-monotonic) crate.
+These examples use two libraries implementing this trait, [`ep-dwt`] and [`ep-pin-toggle`].
 
 ## License
 
@@ -69,3 +66,5 @@ additional terms or conditions.
 
 
 [`feather_m4`]: https://www.adafruit.com/product/3857
+[`ep-dwt`]: https://docs.rs/ep-dwt
+[`ep-pin-toggle`]: https://docs.rs/ep-pin-toggle

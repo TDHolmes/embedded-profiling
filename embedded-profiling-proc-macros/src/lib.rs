@@ -28,8 +28,9 @@ pub fn profile_function(_attr: TokenStream, item: TokenStream) -> TokenStream {
         {
             let start = embedded_profiling::start_snapshot();
             #body
-            let dur = embedded_profiling::end_snapshot(start, #instrumented_function_name);
-            embedded_profiling::log_snapshot(&dur);
+            if let Some(dur) = embedded_profiling::end_snapshot(start, #instrumented_function_name) {
+                embedded_profiling::log_snapshot(&dur);
+            }
         }
     };
 
