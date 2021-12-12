@@ -54,12 +54,11 @@ pub use embedded_profiling_proc_macros::profile_function;
 pub use fugit;
 
 // do the feature gating on a private type so our public documentation is only in one place
-#[cfg(feature = "container-u32")]
+#[cfg(not(feature = "container-u64"))]
 type PrivContainer = u32;
-#[cfg(all(feature = "container-u64", not(feature = "container-u32")))]
+#[cfg(feature = "container-u64")]
 type PrivContainer = u64;
 
-// the `not(feature = "container-u32")` clause is so we can successfully use `--all-features`.
 /// The underlying container of our [`Duration`](fugit::Duration)/[`Instant`](fugit::Instant) types.
 /// Can be either `u32` or `u64`, depending on features. (default: `u32`)
 pub type EPContainer = PrivContainer;
@@ -92,12 +91,6 @@ pub trait EmbeddedProfiler {
     /// Takes a reading from the clock
     fn read_clock(&self) -> EPInstant;
 
-    /// Optionally reset the clock to zero. This function will be called at the beginning of
-    /// [`start_snapshot`].
-    ///
-    /// TODO: not sure if this API is worth while or not.
-    fn reset_clock(&mut self) {}
-
     /// Optionally log the snapshot to some output, like a serial port
     fn log_snapshot(&self, _snapshot: &EPSnapshot) {}
 
@@ -110,8 +103,7 @@ pub trait EmbeddedProfiler {
     fn at_end(&self) {}
 
     /// takes the starting snapshot of a specific trace
-    fn start_snapshot(&mut self) -> EPInstant {
-        self.reset_clock();
+    fn start_snapshot(&self) -> EPInstant {
         self.at_start();
         self.read_clock()
     }
@@ -171,7 +163,7 @@ pub unsafe fn set_profiler(
 }
 
 /// Returns a reference to the configured profiler
-#[inline(never)]
+#[inline]
 pub fn profiler() -> &'static dyn EmbeddedProfiler {
     if STATE.load(Ordering::Acquire) == INITIALIZED {
         unsafe { PROFILER }
@@ -182,8 +174,9 @@ pub fn profiler() -> &'static dyn EmbeddedProfiler {
 }
 
 /// takes the starting snapshot of a specific trace
+#[inline]
 pub fn start_snapshot() -> EPInstant {
-    profiler().read_clock()
+    profiler().start_snapshot()
 }
 
 /// computes the duration of the snapshot given the start time using the
@@ -193,6 +186,7 @@ pub fn end_snapshot(start: EPInstant, name: &'static str) -> EPSnapshot {
 }
 
 /// Logs the given snapshot with the globally configured profiler
+#[inline]
 pub fn log_snapshot(snapshot: &EPSnapshot) {
     profiler().log_snapshot(snapshot);
 }
@@ -241,7 +235,7 @@ mod test {
     #[test]
     #[serial_test::serial]
     fn basic_duration() {
-        let mut profiler = StdMockProfiler::default();
+        let profiler = StdMockProfiler::default();
 
         let start = profiler.start_snapshot();
         std::thread::sleep(std::time::Duration::from_millis(25));
@@ -285,5 +279,66 @@ mod test {
         set_profiler();
 
         delay_25ms();
+    }
+
+    #[cfg(feature = "proc-macros")]
+    #[test]
+    #[serial_test::serial]
+    fn check_call_and_order() {
+        use Ordering::SeqCst;
+
+        #[profile_function]
+        fn delay_25ms() {
+            std::thread::sleep(std::time::Duration::from_millis(25));
+        }
+
+        // set the profiler, if it hasn't been already
+        set_profiler();
+
+        delay_25ms();
+
+        // check if our functions were called and if the order is right
+        let stats = unsafe { &MOCK_PROFILER.as_ref().unwrap().funcs_called };
+        let at_start_was_called = stats.at_start.called.load(SeqCst);
+        let read_clock_was_called = stats.read_clock.called.load(SeqCst);
+        let at_end_was_called = stats.at_end.called.load(SeqCst);
+        // stats.read_clock (but skipped since we've already called it)
+        let log_snapshot_was_called = stats.log_snapshot.called.load(SeqCst);
+
+        let at_start_at = stats.at_start.at.load(SeqCst);
+        let read_clock_at = stats.read_clock.at.load(SeqCst);
+        let at_end_at = stats.at_end.at.load(SeqCst);
+        let log_snapshot_at = stats.log_snapshot.at.load(SeqCst);
+
+        if at_start_was_called {
+            println!("at_start called #{}", at_start_at);
+        } else {
+            println!("at_start not called");
+        }
+        if read_clock_was_called {
+            println!("read_clock called #{}", read_clock_at);
+        } else {
+            println!("read_clock not called");
+        }
+        if at_end_was_called {
+            println!("at_end called #{}", at_end_at);
+        } else {
+            println!("at_end not called");
+        }
+        if log_snapshot_was_called {
+            println!("log_snapshot called #{}", log_snapshot_at);
+        } else {
+            println!("log_snapshot not called");
+        }
+
+        assert!(at_start_was_called, "'at_start' was never called");
+        assert!(read_clock_was_called, "'read_clock' was never called");
+        assert!(at_end_was_called, "'at_end' was never called");
+        assert!(log_snapshot_was_called, "'log_snapshot' was never called");
+
+        assert_eq!(at_start_at, 0, "'at_start' called at wrong time");
+        assert_eq!(read_clock_at, 1, "'read_clock' called at wrong time");
+        assert_eq!(at_end_at, 2, "'at_end' called at wrong time");
+        assert_eq!(log_snapshot_at, 3, "'log_snapshot' called at wrong time");
     }
 }

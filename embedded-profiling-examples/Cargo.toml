@@ -2,7 +2,7 @@ cargo-features = ["per-package-target"]
 
 [package]
 name = "embedded-profiling-examples"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2021"
 forced-target = "thumbv7em-none-eabihf"
 description = "examples for `embedded-profiling`"
@@ -15,14 +15,20 @@ readme = "# Embedded Profiling Examples"
 [dependencies]
 embedded-profiling = { path = "../embedded-profiling", features = ["proc-macros", "dwt-systick"] }
 feather_m4 = { git = "https://github.com/atsamd-rs/atsamd/", features = ["usb", "unproven", "rt"] }
-panic-persist = {version = "0.3", optional = true}
 panic-halt = "0.2"
-usb-device = "0.2"
-usbd-serial = "0.1"
 cortex-m = "0.7"
 heapless = "0.7"
 log = "0.4"
 
+panic-persist = {version = "0.3", optional = true}
+usb-device = {version = "0.2", optional = true}
+usbd-serial = {version = "0.1", optional = true}
+
 [features]
 default = ["panic_persist"]
+usb = ["usb-device", "usbd-serial"]
 panic_persist = ["panic-persist"]
+
+[[bin]]
+name = "delay_usb"
+required-features = ["usb"]

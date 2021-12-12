@@ -10,7 +10,3 @@ codegen-units = 1
 debug = true
 lto = true
 opt-level = 'z'
-
-[profile.dev]
-debug = true
-opt-level = 2

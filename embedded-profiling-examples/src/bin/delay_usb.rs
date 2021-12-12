@@ -29,11 +29,6 @@ fn main() -> ! {
     let mut peripherals = Peripherals::take().unwrap();
     let mut core = CorePeripherals::take().unwrap();
 
-    unsafe {
-        // disable data and instruction caching
-        peripherals.CMCC.ctrl.write(|w| w.bits(0_u32));
-    }
-
     let mut clocks = GenericClockController::with_internal_32kosc(
         peripherals.GCLK,
         &mut peripherals.MCLK,
