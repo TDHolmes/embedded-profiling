@@ -13,9 +13,10 @@
 //! ```
 //! let start = embedded_profiling::start_snapshot();
 //! // (...) some expensive computation
-//! let snapshot = embedded_profiling::end_snapshot(start, "name-of-computation");
-//! // Optionally, log it
-//! embedded_profiling::log_snapshot(&snapshot);
+//! if let Some(snapshot) = embedded_profiling::end_snapshot(start, "name-of-computation") {
+//!     // Optionally, log it if we didn't overflow
+//!     embedded_profiling::log_snapshot(&snapshot);
+//! }
 //! ```
 //!
 //! Or profile some code in a closure:
@@ -238,7 +239,7 @@ mod test {
 
         let start = profiler.start_snapshot();
         std::thread::sleep(std::time::Duration::from_millis(25));
-        let end = profiler.end_snapshot(start, "basic_dur");
+        let end = profiler.end_snapshot(start, "basic_dur").unwrap();
         profiler.log_snapshot(&end);
     }
 
@@ -250,9 +251,8 @@ mod test {
 
         let start = start_snapshot();
         std::thread::sleep(std::time::Duration::from_millis(25));
-        if let Some(end) = end_snapshot(start, "basic_dur") {
-            log_snapshot(&end);
-        }
+        let end = end_snapshot(start, "basic_dur").unwrap();
+        log_snapshot(&end);
     }
 
     #[test]
