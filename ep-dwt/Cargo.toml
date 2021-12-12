@@ -9,7 +9,7 @@ categories = ["development-tools::profiling", "embedded"]
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-embedded-profiling = {version = "0.1", path = "../embedded-profiling"}
+embedded-profiling = {version = "0.2", path = "../embedded-profiling"}
 cortex-m = "0.7"
 log = "0.4"
 

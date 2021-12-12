@@ -1,7 +1,7 @@
 [package]
 name = "embedded-profiling"
 description = "Profiling for `no-std` embedded targets"
-version = "0.1.6"
+version = "0.2.0"
 edition = "2021"
 repository = "https://github.com/TDHolmes/embedded-profiling"
 keywords = ["performance", "profiling", "no-std"]
@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 fugit = "0.3"
-embedded-profiling-proc-macros = { path = "../embedded-profiling-proc-macros", version = "0.1", optional = true }
+embedded-profiling-proc-macros = { path = "../embedded-profiling-proc-macros", version = "0.2", optional = true }
 
 [dev-dependencies]
 serial_test = "0.5"
