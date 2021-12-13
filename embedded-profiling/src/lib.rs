@@ -147,6 +147,18 @@ pub struct SetProfilerError;
 ///
 /// # Errors
 /// returns `Err(SetProfilerError)` when a global profiler has already been configured
+///
+/// ```
+/// # struct MyProfiler;
+/// # impl embedded_profiling::EmbeddedProfiler for MyProfiler { fn read_clock(&self) -> embedded_profiling::EPInstant { embedded_profiling::EPInstant::from_ticks(0) } }
+/// # static MY_PROFILER: MyProfiler = MyProfiler;
+/// let noop_profiler_ref = embedded_profiling::profiler();  // no-op profiler returned because we haven't set one yet
+/// // interrupts should be disabled while this is called with something like `cortex_m::interrupt::free`
+/// unsafe {
+///     embedded_profiling::set_profiler(&MY_PROFILER).unwrap();
+/// }
+/// let my_profiler_ref = embedded_profiling::profiler();  // our profiler now returned
+/// ```
 pub unsafe fn set_profiler(
     profiler: &'static dyn EmbeddedProfiler,
 ) -> Result<(), SetProfilerError> {
@@ -162,6 +174,16 @@ pub unsafe fn set_profiler(
 }
 
 /// Returns a reference to the configured profiler
+///
+/// If a profiler hasn't yet been set by [`set_profiler`], the no-op profiler
+/// will be returned. Generally, you should use one of the other provided
+/// functions rather than getting a reference through this function.
+///
+/// ```
+/// let start = embedded_profiling::profiler().start_snapshot();
+/// // (...)
+/// let snapshot = embedded_profiling::profiler().end_snapshot(start, "doc-example");
+/// ```
 #[inline]
 pub fn profiler() -> &'static dyn EmbeddedProfiler {
     if STATE.load(Ordering::Acquire) == INITIALIZED {
@@ -173,6 +195,12 @@ pub fn profiler() -> &'static dyn EmbeddedProfiler {
 }
 
 /// takes the starting snapshot of a specific trace
+///
+/// ```
+/// let start = embedded_profiling::start_snapshot();
+/// // (...)
+/// let snapshot = embedded_profiling::end_snapshot(start, "doc-example");
+/// ```
 #[inline]
 pub fn start_snapshot() -> EPInstant {
     profiler().start_snapshot()
@@ -186,6 +214,13 @@ pub fn end_snapshot(start: EPInstant, name: &'static str) -> Option<EPSnapshot> 
 }
 
 /// Logs the given snapshot with the globally configured profiler
+///
+/// ```
+/// let start = embedded_profiling::start_snapshot();
+/// // (...)
+/// if let Some(snapshot) = embedded_profiling::end_snapshot(start, "doc-example") {
+///     embedded_profiling::log_snapshot(&snapshot);
+/// }
 #[inline]
 pub fn log_snapshot(snapshot: &EPSnapshot) {
     profiler().log_snapshot(snapshot);
