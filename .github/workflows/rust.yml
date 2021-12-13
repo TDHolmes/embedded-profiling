@@ -14,6 +14,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      CARGO_BUILD_TARGET: thumbv7em-none-eabihf
 
     steps:
     - name: Install Rust (thumbv7em)
@@ -29,16 +31,16 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build (default)
-      run: RUSTFLAGS="-D warnings" cargo build --target thumbv7em-none-eabihf
+      run: RUSTFLAGS="-D warnings" cargo build
 
     - name: Build (all features)
-      run: RUSTFLAGS="-D warnings" cargo build --target thumbv7em-none-eabihf --all-features
+      run: RUSTFLAGS="-D warnings" cargo build --all-features
 
     - name: test embedded-profiling
-      run: RUSTFLAGS="-D warnings" cargo test --manifest-path ./embedded-profiling/Cargo.toml
+      run: unset CARGO_BUILD_TARGET && RUSTFLAGS="-D warnings" cargo test --manifest-path ./embedded-profiling/Cargo.toml
 
     - name: test embedded-profiling-proc-macros
-      run: RUSTFLAGS="-D warnings" cargo test --manifest-path ./embedded-profiling-proc-macros/Cargo.toml
+      run: unset CARGO_BUILD_TARGET && RUSTFLAGS="-D warnings" cargo test --manifest-path ./embedded-profiling-proc-macros/Cargo.toml
 
     - name: Clippy
       uses: actions-rs/clippy-check@v1
