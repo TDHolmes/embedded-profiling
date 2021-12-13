@@ -14,6 +14,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      CARGO_BUILD_TARGET: thumbv7em-none-eabihf
 
     steps:
     - name: Install Rust (thumbv7em)

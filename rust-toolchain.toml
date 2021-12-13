@@ -1,5 +1,0 @@
-[toolchain]
-channel = "nightly"
-components = [ "rustfmt", "clippy" ]
-targets = ["thumbv7em-none-eabihf", "aarch64-apple-darwin"]
-profile = "minimal"
