@@ -13,6 +13,10 @@ no-op profiler that does nothing until you call `set_profiler`.
 Once your profiler has been installed, your profiling
 functionality will be in use.
 
+Alternatively, if you don't want to use the globally installed profiler
+or have the overhead of `dyn trait` objects, you can obviously use the
+trait methods directly on the struct that implements the trait.
+
 You can manually start & end your snapshot:
 ```rust
 let start = embedded_profiling::start_snapshot();
