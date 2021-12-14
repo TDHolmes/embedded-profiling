@@ -81,7 +81,7 @@ fn main() -> ! {
     // initialize our profiling timer & structure
     log::debug!("initializing our tracing stuff");
     let dwt_profiler = cortex_m::singleton!(: ep_dwt::DwtProfiler<CORE_FREQ> =
-            ep_dwt::DwtProfiler::new(&mut core.DCB, core.DWT, CORE_FREQ))
+            ep_dwt::DwtProfiler::new(&mut core.DCB, core.DWT, CORE_FREQ).unwrap())
     .unwrap();
     unsafe {
         ep::set_profiler(dwt_profiler).unwrap();
