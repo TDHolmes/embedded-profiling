@@ -1,11 +1,11 @@
-//! An [`EmbeddedProfiler`] implementation that only toggles the given pin
+//! An [`EmbeddedProfiler`] implementation that toggles the given pin.
 #![cfg_attr(not(test), no_std)]
 
 use core::cell::RefCell;
 use embedded_hal::digital::v2::OutputPin;
 use embedded_profiling::{EPInstant, EmbeddedProfiler};
 
-/// Implements [`EmbeddedProfiler`] by just toggling the pin
+/// Implements [`EmbeddedProfiler`] by toggling the given pin.
 pub struct EPPinToggle<E, P>
 where
     P: OutputPin<Error = E>,
