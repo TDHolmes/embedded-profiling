@@ -50,7 +50,7 @@ fn my_long_running_function() {
 
 A working example program on a [`feather_m4`] development board is provided
 in the [`embedded-profiling` github repo](https://github.com/TDHolmes/embedded-profiling).
-These examples use two libraries implementing this trait, [`ep-dwt`] and [`ep-pin-toggle`].
+These examples use some libraries implementing this trait, [`ep-systick`], [`ep-dwt`], and [`ep-pin-toggle`].
 
 ## License
 
@@ -71,4 +71,5 @@ additional terms or conditions.
 
 [`feather_m4`]: https://www.adafruit.com/product/3857
 [`ep-dwt`]: https://docs.rs/ep-dwt
+[`ep-systick`]: https://docs.rs/ep-systick
 [`ep-pin-toggle`]: https://docs.rs/ep-pin-toggle
