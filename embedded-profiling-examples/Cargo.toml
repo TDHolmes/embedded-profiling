@@ -13,6 +13,7 @@ readme = "# Embedded Profiling Examples"
 embedded-profiling = { path = "../embedded-profiling", features = ["proc-macros"] }
 ep-pin-toggle = { path = "../ep-pin-toggle" }
 ep-dwt = { path = "../ep-dwt" }
+ep-systick = { path = "../ep-systick" }
 
 feather_m4 = { git = "https://github.com/atsamd-rs/atsamd/", features = ["usb", "unproven", "rt"] }
 panic-halt = "0.2"
@@ -28,7 +29,12 @@ usbd-serial = {version = "0.1", optional = true}
 default = ["panic_persist"]
 usb = ["usb-device", "usbd-serial"]
 panic_persist = ["panic-persist"]
+extended = ["ep-systick/extended", "embedded-profiling/container-u64"]
 
 [[bin]]
-name = "delay_usb"
+name = "delay_usb_dwt"
 required-features = ["usb"]
+
+[[bin]]
+name = "delay_usb_systick"
+required-features = ["usb", "extended"]

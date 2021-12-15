@@ -4,7 +4,8 @@ members = [
     "embedded-profiling-proc-macros",
     "embedded-profiling-examples",
     "ep-dwt",
-    "ep-pin-toggle"
+    "ep-pin-toggle",
+    "ep-systick",
 ]
 
 [profile.release]

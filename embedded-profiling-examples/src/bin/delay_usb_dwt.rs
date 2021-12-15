@@ -22,7 +22,7 @@ const CORE_FREQ: u32 = 120_000_000;
 /// Shared atomic between RTC interrupt and `sleeping_delay` module
 static INTERRUPT_FIRED: atomic::AtomicBool = atomic::AtomicBool::new(false);
 
-static mut EP_SYSTICK_INSTANCE: Option<ep_dwt::DwtProfiler<CORE_FREQ>> = None;
+static mut EP_INSTANCE: Option<ep_dwt::DwtProfiler<CORE_FREQ>> = None;
 
 #[bsp::entry]
 fn main() -> ! {
@@ -82,10 +82,10 @@ fn main() -> ! {
 
     // initialize our profiling timer & structure
     log::debug!("initializing our tracing stuff");
-    let dwt_systick = ep_dwt::DwtProfiler::<CORE_FREQ>::new(&mut core.DCB, core.DWT, CORE_FREQ);
+    let dwt_profiler = ep_dwt::DwtProfiler::<CORE_FREQ>::new(&mut core.DCB, core.DWT, CORE_FREQ);
     unsafe {
-        EP_SYSTICK_INSTANCE = Some(dwt_systick);
-        ep::set_profiler(EP_SYSTICK_INSTANCE.as_ref().unwrap()).unwrap();
+        EP_INSTANCE = Some(dwt_profiler);
+        ep::set_profiler(EP_INSTANCE.as_ref().unwrap()).unwrap();
     }
 
     // Loop and profile our delay function
