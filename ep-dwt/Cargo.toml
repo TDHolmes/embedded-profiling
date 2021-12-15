@@ -1,6 +1,6 @@
 [package]
 name = "ep-dwt"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "`embedded-profiling` implementation using the Data Watchpoint and Tracing (DWT) unit"
 repository = "https://github.com/TDHolmes/embedded-profiling"
