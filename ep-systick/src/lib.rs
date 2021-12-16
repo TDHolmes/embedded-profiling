@@ -1,4 +1,4 @@
-//! [`EmbeddedProfiler`] implementation based on [`systick`](SYST).
+//! [`EmbeddedProfiler`] implementation based on [`systick`](cortex_m::peripheral::SYST).
 
 #![cfg_attr(not(test), no_std)]
 use cortex_m::peripheral::{syst::SystClkSource, SYST};
@@ -8,12 +8,12 @@ use embedded_profiling::{EPContainer, EPInstant, EPSnapshot, EmbeddedProfiler};
 /// Tracker of `systick` cycle count overflows to extend systick's 24 bit timer
 static ROLLOVER_COUNT: core::sync::atomic::AtomicU32 = core::sync::atomic::AtomicU32::new(0);
 
-/// The reload value of the [`systick`](SYST) peripheral. Also is the max it can go (2**24).
+/// The reload value of the [`systick`](cortex_m::peripheral::SYST) peripheral. Also is the max it can go (2**24).
 const SYSTICK_RELOAD: u32 = 0x00FF_FFFF;
 
-/// [`systick`](SYST) implementation of [`EmbeddedProfiler`].
+/// [`systick`](cortex_m::peripheral::SYST) implementation of [`EmbeddedProfiler`].
 ///
-/// The frequency of the [`systick`](SYST) is encoded using the parameter `FREQ`.
+/// The frequency of the [`systick`](cortex_m::peripheral::SYST) is encoded using the parameter `FREQ`.
 pub struct SysTickProfiler<const FREQ: u32> {
     #[allow(unused)]
     // we currently take SYST by value only to ensure ownership
@@ -21,7 +21,7 @@ pub struct SysTickProfiler<const FREQ: u32> {
 }
 
 impl<const FREQ: u32> SysTickProfiler<FREQ> {
-    /// Enable the [`systick`](SYST) and provide a new [`EmbeddedProfiler`].
+    /// Enable the [`systick`](cortex_m::peripheral::SYST) and provide a new [`EmbeddedProfiler`].
     ///
     /// Note that the `sysclk` parameter should come from e.g. the HAL's clock generation function
     /// so the real speed and the declared speed can be compared.
@@ -105,7 +105,7 @@ impl<const FREQ: u32> EmbeddedProfiler for SysTickProfiler<FREQ> {
 
         #[cfg(feature = "extended")]
         {
-            /// the resolution of [`systick`](SYST), 2**24
+            /// the resolution of [`systick`](cortex_m::peripheral::SYST), 2**24
             const SYSTICK_RESOLUTION: EPContainer = 16777216;
 
             // add on the number of times we've rolled over (systick resolution is 2**24)
