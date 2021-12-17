@@ -16,7 +16,7 @@ ep-dwt = { path = "../ep-dwt" }
 ep-systick = { path = "../ep-systick" }
 
 feather_m4 = { git = "https://github.com/atsamd-rs/atsamd/", features = ["usb", "unproven", "rt"] }
-panic-halt = "0.2"
+panic-halt = { version = "0.2", optional = true }
 cortex-m = "0.7"
 heapless = "0.7"
 log = "0.4"
@@ -29,6 +29,7 @@ usbd-serial = {version = "0.1", optional = true}
 default = ["panic_persist"]
 usb = ["usb-device", "usbd-serial"]
 panic_persist = ["panic-persist"]
+panic_halt = ["panic-halt"]
 extended = ["ep-systick/extended", "embedded-profiling/container-u64"]
 
 [[bin]]

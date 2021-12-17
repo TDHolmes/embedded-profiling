@@ -10,6 +10,7 @@ use hal::pac::{CorePeripherals, Peripherals};
 use hal::prelude::*;
 
 use embedded_profiling as ep;
+#[cfg(feature = "panic_halt")]
 use panic_halt as _;
 
 type EPPinToggleRedLed = EPPinToggle<core::convert::Infallible, bsp::RedLed>;

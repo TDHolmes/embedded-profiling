@@ -18,3 +18,4 @@ cortex-m-rt = {version = "0.7", optional = true}
 [features]
 extended = ["cortex-m-rt"]
 container-u64 = ["embedded-profiling/container-u64"]
+proc-macros = ["embedded-profiling/proc-macros"]

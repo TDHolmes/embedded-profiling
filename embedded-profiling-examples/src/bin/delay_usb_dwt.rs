@@ -14,15 +14,13 @@ use hal::sleeping_delay::SleepingDelay;
 
 use cortex_m::peripheral::NVIC;
 use embedded_profiling as ep;
-#[cfg(not(feature = "panic_persist"))]
+#[cfg(feature = "panic_persist")]
 use panic_halt as _;
 
 const CORE_FREQ: u32 = 120_000_000;
 
 /// Shared atomic between RTC interrupt and `sleeping_delay` module
 static INTERRUPT_FIRED: atomic::AtomicBool = atomic::AtomicBool::new(false);
-
-static mut EP_INSTANCE: Option<ep_dwt::DwtProfiler<CORE_FREQ>> = None;
 
 #[bsp::entry]
 fn main() -> ! {
@@ -82,10 +80,11 @@ fn main() -> ! {
 
     // initialize our profiling timer & structure
     log::debug!("initializing our tracing stuff");
-    let dwt_profiler = ep_dwt::DwtProfiler::<CORE_FREQ>::new(&mut core.DCB, core.DWT, CORE_FREQ);
+    let dwt_profiler = cortex_m::singleton!(: ep_dwt::DwtProfiler<CORE_FREQ> =
+            ep_dwt::DwtProfiler::new(&mut core.DCB, core.DWT, CORE_FREQ))
+    .unwrap();
     unsafe {
-        EP_INSTANCE = Some(dwt_profiler);
-        ep::set_profiler(EP_INSTANCE.as_ref().unwrap()).unwrap();
+        ep::set_profiler(dwt_profiler).unwrap();
     }
 
     // Loop and profile our delay function

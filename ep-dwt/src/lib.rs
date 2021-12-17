@@ -1,4 +1,37 @@
-//! [`EmbeddedProfiler`] implementation based on [`DWT`](cortex_m::peripheral::DWT).
+//! [`EmbeddedProfiler`] implementation based on [`DWT`].
+//!
+//! This profiler depends on the [`DWT`] hardware which is not available on cortex-M0.
+//! The profiler's resolution is the same as the core clock. The cycle count clock is
+//! free-running, so overflows are likely if you have long running functions to profile.
+//! To mitigate this, one can use the `extended` feature, which extends the resolution of
+//! the counter from [`u32`] to [`u64`] using the [`DebugMonitor`] exception. It is set
+//! to expire just before overflow, so you can expect an exception to fire every 2**32
+//! clock cycles.
+//!
+//! Snapshots are logged using [`log::info!`], so having a logger installed is required
+//! if you want to use [`embedded_profiling::log_snapshot`] or functions that call it
+//! (like [`embedded_profiling::profile_function`]).
+//!
+//! ## Example Usage
+//!
+//!```no_run
+//! # use cortex_m::peripheral::Peripherals as CorePeripherals;
+//! # const CORE_FREQ: u32 = 120_000_000;
+//! let mut core = CorePeripherals::take().unwrap();
+//! // (...)
+//! let dwt_profiler = cortex_m::singleton!(: ep_dwt::DwtProfiler::<CORE_FREQ> =
+//!     ep_dwt::DwtProfiler::<CORE_FREQ>::new(&mut core.DCB, core.DWT, CORE_FREQ).unwrap())
+//! .unwrap();
+//! unsafe {
+//!     embedded_profiling::set_profiler(dwt_profiler).unwrap();
+//! }
+//! // (...)
+//! embedded_profiling::profile("print_profile", || println!("Hello, world"));
+//! ```
+//!
+//! [`DWT`]: cortex_m::peripheral::DWT
+//! [`DebugMonitor`]: `cortex_m::peripheral::scb::Exception::DebugMonitor`
+
 #![cfg_attr(not(test), no_std)]
 use embedded_profiling::{EPContainer, EPInstant, EPSnapshot, EmbeddedProfiler};
 
@@ -19,13 +52,13 @@ static_assertions::assert_type_eq_all!(EPContainer, u64);
 
 /// DWT trace unit implementing [`EmbeddedProfiler`].
 ///
-/// The frequency of the [`DWT`](cortex_m::peripheral::DWT) is encoded using the parameter `FREQ`.
+/// The frequency of the [`DWT`] is encoded using the parameter `FREQ`.
 pub struct DwtProfiler<const FREQ: u32> {
     dwt: DWT,
 }
 
 impl<const FREQ: u32> DwtProfiler<FREQ> {
-    /// Enable the [`DWT`](cortex_m::peripheral::DWT) and provide a new [`EmbeddedProfiler`].
+    /// Enable the [`DWT`] and provide a new [`EmbeddedProfiler`].
     ///
     /// Note that the `sysclk` parameter should come from e.g. the HAL's clock generation function
     /// so the real speed and the declared speed can be compared.

@@ -18,3 +18,4 @@ static_assertions = {version = "1", optional = true}
 
 [features]
 extended = ["cortex-m-rt", "static_assertions", "embedded-profiling/container-u64"]
+proc-macros = ["embedded-profiling/proc-macros"]

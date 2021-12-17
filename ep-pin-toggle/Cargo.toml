@@ -12,4 +12,8 @@ license = "MIT OR Apache-2.0"
 embedded-profiling = {version = "0.2", path = "../embedded-profiling"}
 embedded-hal = "0.2"
 
+[dev-dependencies]
+cortex-m = "0.7"
+
 [features]
+proc-macros = ["embedded-profiling/proc-macros"]

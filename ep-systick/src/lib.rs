@@ -1,4 +1,36 @@
 //! [`EmbeddedProfiler`] implementation based on [`systick`](cortex_m::peripheral::SYST).
+//!
+//! This profiler depends on the [`SYST`] hardware common to most cortex-M devices.
+//! The profiler's configured resolution is the same as the core clock. The cycle count clock is
+//! free-running, so overflows are likely if you have long running functions to profile.
+//! To mitigate this, one can use the `extended` feature, which extends the resolution of
+//! the counter from [`u32`] to [`u64`] using the [`SysTick`] exception. It is set
+//! to expire just before overflow, so you can expect an exception to fire every 2**24
+//! clock cycles.
+//!
+//! Snapshots are logged using [`log::info!`], so having a logger installed is required
+//! if you want to use [`embedded_profiling::log_snapshot`] or functions that call it
+//! (like [`embedded_profiling::profile_function`]).
+//!
+//! ## Example Usage
+//!
+//!```no_run
+//! # use cortex_m::peripheral::Peripherals as CorePeripherals;
+//! # const CORE_FREQ: u32 = 120_000_000;
+//! let mut core = CorePeripherals::take().unwrap();
+//! // (...)
+//! let dwt_profiler = cortex_m::singleton!(: ep_systick::SysTickProfiler::<CORE_FREQ> =
+//!     ep_systick::SysTickProfiler::<CORE_FREQ>::new(core.SYST, CORE_FREQ))
+//! .unwrap();
+//! unsafe {
+//!     embedded_profiling::set_profiler(dwt_profiler).unwrap();
+//! }
+//! // (...)
+//! embedded_profiling::profile("print_profile", || println!("Hello, world"));
+//! ```
+//!
+//! [`SYST`]: cortex_m::peripheral::SYST
+//! [`SysTick`]: `cortex_m::peripheral::scb::Exception::SysTick`
 
 #![cfg_attr(not(test), no_std)]
 use cortex_m::peripheral::{syst::SystClkSource, SYST};
