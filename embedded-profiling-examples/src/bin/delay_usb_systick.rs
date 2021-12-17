@@ -14,7 +14,7 @@ use hal::sleeping_delay::SleepingDelay;
 
 use cortex_m::peripheral::NVIC;
 use embedded_profiling as ep;
-#[cfg(feature = "panic_persist")]
+#[cfg(feature = "panic_halt")]
 use panic_halt as _;
 
 const CORE_FREQ: u32 = 120_000_000;
@@ -66,7 +66,7 @@ fn main() -> ! {
     }
 
     // Check if there was a panic message, if so, print it out
-    #[cfg(feature = "panic_persist")]
+    #[cfg(all(feature = "panic_persist", not(feature = "panic_halt")))]
     if let Some(msg) = panic_persist::get_panic_message_bytes() {
         log::error!("panic from previous boot:");
         let mut bytes_written = 0;

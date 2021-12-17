@@ -34,7 +34,7 @@ fn main() -> ! {
     let mut red_led: bsp::RedLed = pins.d13.into();
     red_led.set_low().ok();
 
-    #[cfg(feature = "panic_persist")]
+    #[cfg(all(feature = "panic_persist", not(feature = "panic_halt")))]
     if let Some(_) = panic_persist::get_panic_message_bytes() {
         // blink SOS
         for delay_ms in [
