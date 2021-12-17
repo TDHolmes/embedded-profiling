@@ -32,7 +32,20 @@ fn main() -> ! {
 
     let pins = bsp::Pins::new(peripherals.PORT);
     let mut red_led: bsp::RedLed = pins.d13.into();
-    red_led.set_high().ok();
+    red_led.set_low().ok();
+
+    #[cfg(feature = "panic_persist")]
+    if let Some(_) = panic_persist::get_panic_message_bytes() {
+        // blink SOS
+        for delay_ms in [
+            100_u32, 100_u32, 100_u32, 500_u32, 500_u32, 500_u32, 100_u32, 100_u32, 100_u32,
+        ] {
+            red_led.set_high().ok();
+            delay.delay_ms(delay_ms);
+            red_led.set_low().ok();
+            delay.delay_ms(delay_ms);
+        }
+    }
 
     // initialize our profiling timer & structure
     let ep_pin_toggle: &'static EPPinToggleRedLed =
