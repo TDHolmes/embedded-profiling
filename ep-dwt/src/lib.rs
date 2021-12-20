@@ -29,6 +29,20 @@
 //! embedded_profiling::profile("print_profile", || println!("Hello, world"));
 //! ```
 //!
+//! ## Features
+//!
+//! ### `extended`
+//!
+//! Extends the [`DWT`] cycle counter's native resolution from 32 bit to 64 bit using
+//! the cycle compare functionality and the [`DebugMonitor`] exception. The exception will
+//! fire every 2**32 clock cycles. Enables the [`embedded-profiling`](embedded_profiling)
+//! feature `container-u64`.
+//!
+//! ### `proc-macros`
+//!
+//! enables the `proc-macros` feature in [`embedded-profiling`](embedded_profiling). Enables
+//! the [`embedded_profiling::profile_function`] procedural macro.
+//!
 //! [`DWT`]: cortex_m::peripheral::DWT
 //! [`DebugMonitor`]: `cortex_m::peripheral::scb::Exception::DebugMonitor`
 

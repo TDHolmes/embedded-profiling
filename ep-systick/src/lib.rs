@@ -4,7 +4,7 @@
 //! The profiler's configured resolution is the same as the core clock. The cycle count clock is
 //! free-running, so overflows are likely if you have long running functions to profile.
 //! To mitigate this, one can use the `extended` feature, which extends the resolution of
-//! the counter from [`u32`] to [`u64`] using the [`SysTick`] exception. It is set
+//! the counter from 24 bit to [`u32`] or [`u64`] using the [`SysTick`] exception. It is set
 //! to expire just before overflow, so you can expect an exception to fire every 2**24
 //! clock cycles.
 //!
@@ -28,6 +28,23 @@
 //! // (...)
 //! embedded_profiling::profile("print_profile", || println!("Hello, world"));
 //! ```
+//!
+//! ## Features
+//!
+//! ### `extended`
+//!
+//! as discussed above, extend the native resolution of 24 bits to either 32 or 64 bits
+//! using the [`SysTick`] exception. The exception fires ever 2**24 clock cycles.
+//!
+//! ### `container-u64`
+//!
+//! enables the `container-u64` feature in [`embedded-profiling`](embedded_profiling). Use
+//! a [`u64`] as the time storage type instead of [`u32`] for longer running profiling.
+//!
+//! ### `proc-macros`
+//!
+//! enables the `proc-macros` feature in [`embedded-profiling`](embedded_profiling). Enables
+//! the [`embedded_profiling::profile_function`] procedural macro.
 //!
 //! [`SYST`]: cortex_m::peripheral::SYST
 //! [`SysTick`]: `cortex_m::peripheral::scb::Exception::SysTick`

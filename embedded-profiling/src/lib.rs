@@ -40,6 +40,18 @@
 //!     println!("Hello, world!");
 //! }
 //! ```
+//!
+//! ## Features
+//!
+//! ### `container-u64`
+//!
+//! Use a [`u64`] as the time storage type instead of [`u32`] for longer running profiling.
+//!
+//! ### `proc-macros`
+//!
+//! enables the `proc-macros` feature in [`embedded-profiling`](self). Enables
+//! the [`embedded_profiling::profile_function`](self::profile_function) procedural macro.
+//!
 #![warn(missing_docs)]
 #![cfg_attr(not(test), no_std)]
 
