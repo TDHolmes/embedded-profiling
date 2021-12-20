@@ -17,3 +17,6 @@ cortex-m = "0.7"
 
 [features]
 proc-macros = ["embedded-profiling/proc-macros"]
+
+[package.metadata.docs.rs]
+all-features = true
