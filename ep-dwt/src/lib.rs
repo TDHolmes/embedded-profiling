@@ -10,7 +10,7 @@
 //!
 //! Snapshots are logged using [`log::info!`], so having a logger installed is required
 //! if you want to use [`embedded_profiling::log_snapshot`] or functions that call it
-//! (like [`macro@embedded_profiling::profile_function`]).
+//! (like [`embedded_profiling::profile_function`]).
 //!
 //! ## Example Usage
 //!
@@ -41,10 +41,11 @@
 //! ### `proc-macros`
 //!
 //! enables the `proc-macros` feature in [`embedded-profiling`](embedded_profiling). Enables
-//! the [`macro@embedded_profiling::profile_function`] procedural macro.
+//! the [`embedded_profiling::profile_function`] procedural macro.
 //!
 //! [`DWT`]: cortex_m::peripheral::DWT
 //! [`DebugMonitor`]: `cortex_m::peripheral::scb::Exception::DebugMonitor`
+//! [`embedded_profiling::profile_function`]: https://docs.rs/embedded-profiling/latest/embedded_profiling/attr.profile_function.html
 #![cfg_attr(not(test), no_std)]
 
 use embedded_profiling::{EPContainer, EPInstant, EPSnapshot, EmbeddedProfiler};
