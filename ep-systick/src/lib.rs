@@ -48,8 +48,8 @@
 //!
 //! [`SYST`]: cortex_m::peripheral::SYST
 //! [`SysTick`]: `cortex_m::peripheral::scb::Exception::SysTick`
-
 #![cfg_attr(not(test), no_std)]
+
 use cortex_m::peripheral::{syst::SystClkSource, SYST};
 use embedded_profiling::{EPContainer, EPInstant, EPSnapshot, EmbeddedProfiler};
 
@@ -92,56 +92,9 @@ impl<const FREQ: u32> SysTickProfiler<FREQ> {
         Self { systick }
     }
 
-    /// binary GCD function stolen from wikipedia, made const
-    const fn gcd(mut u: EPContainer, mut v: EPContainer) -> EPContainer {
-        // Base cases: gcd(n, 0) = gcd(0, n) = n
-        if u == 0 {
-            return v;
-        } else if v == 0 {
-            return u;
-        }
-
-        // Using identities 2 and 3:
-        // gcd(2ⁱ u, 2ʲ v) = 2ᵏ gcd(u, v) with u, v odd and k = min(i, j)
-        // 2ᵏ is the greatest power of two that divides both u and v
-        let i = u.trailing_zeros();
-        u >>= i;
-        let j = v.trailing_zeros();
-        v >>= j;
-
-        // min(i, j);
-        let k = if i <= j { i } else { j };
-
-        loop {
-            // u and v are odd at the start of the loop
-            // debug_assert!(u % 2 == 1, "u = {} is even", u);
-            // debug_assert!(v % 2 == 1, "v = {} is even", v);
-
-            // Swap if necessary so u <= v
-            if u > v {
-                // swap(&mut u, &mut v);
-                let tmp = u;
-                u = v;
-                v = tmp;
-            }
-
-            // Using identity 4 (gcd(u, v) = gcd(|v-u|, min(u, v))
-            v -= u;
-
-            // Identity 1: gcd(u, 0) = u
-            // The shift by k is necessary to add back the 2ᵏ factor that was removed before the loop
-            if v == 0 {
-                return u << k;
-            }
-
-            // Identity 3: gcd(u, 2ʲ v) = gcd(u, v) (u is known to be odd)
-            v >>= v.trailing_zeros();
-        }
-    }
-
     /// Reduce the fraction we need to convert between 1µs precision and whatever our core clock is running at
     pub(crate) const fn reduced_fraction() -> (EPContainer, EPContainer) {
-        let gcd = Self::gcd(1_000_000, FREQ as EPContainer) as EPContainer;
+        let gcd = gcd::binary_u64(1_000_000_u64, FREQ as u64) as EPContainer;
         (1_000_000 / gcd, FREQ as EPContainer / gcd)
     }
 }
@@ -180,4 +133,17 @@ use cortex_m_rt::exception;
 #[allow(non_snake_case)]
 fn SysTick() {
     ROLLOVER_COUNT.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn check_reduced_fraction() {
+        const FREQ: u32 = 120_000_000;
+        let (num, den) = SysTickProfiler::<FREQ>::reduced_fraction();
+        assert_eq!(1, num);
+        assert_eq!(120, den);
+    }
 }

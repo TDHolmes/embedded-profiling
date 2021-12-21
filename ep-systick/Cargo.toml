@@ -12,6 +12,7 @@ license = "MIT OR Apache-2.0"
 embedded-profiling = {version = "0.2", path = "../embedded-profiling"}
 cortex-m = "0.7"
 log = "0.4"
+gcd = ">=2.1"  # const GCD functionality
 
 cortex-m-rt = {version = "0.7", optional = true}
 
