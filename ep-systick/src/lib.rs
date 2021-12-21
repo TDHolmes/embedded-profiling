@@ -103,16 +103,16 @@ impl<const FREQ: u32> EmbeddedProfiler for SysTickProfiler<FREQ> {
     fn read_clock(&self) -> EPInstant {
         let raw_ticks = SYST::get_current();
         #[allow(unused_mut)]
-        let mut count = (SYSTICK_RELOAD - raw_ticks) as EPContainer;
+        let mut count = EPContainer::from(SYSTICK_RELOAD - raw_ticks);
 
         #[cfg(feature = "extended")]
         {
             /// the resolution of [`systick`](cortex_m::peripheral::SYST), 2**24
-            const SYSTICK_RESOLUTION: EPContainer = 16777216;
+            const SYSTICK_RESOLUTION: EPContainer = 16_777_216;
 
             // add on the number of times we've rolled over (systick resolution is 2**24)
             let rollover_count =
-                ROLLOVER_COUNT.load(core::sync::atomic::Ordering::Acquire) as EPContainer;
+                EPContainer::from(ROLLOVER_COUNT.load(core::sync::atomic::Ordering::Acquire));
             count += rollover_count * SYSTICK_RESOLUTION;
         }
 

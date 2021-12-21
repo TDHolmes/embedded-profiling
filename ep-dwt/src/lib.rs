@@ -109,11 +109,11 @@ impl<const FREQ: u32> EmbeddedProfiler for DwtProfiler<FREQ> {
     fn read_clock(&self) -> EPInstant {
         // get the cycle count and add the rollover if we're extended
         #[allow(unused_mut)]
-        let mut count = self.dwt.cyccnt.read() as EPContainer;
+        let mut count = EPContainer::from(self.dwt.cyccnt.read());
         #[cfg(feature = "extended")]
         {
-            count +=
-                ROLLOVER_COUNT.load(Ordering::Relaxed) as EPContainer * u32::MAX as EPContainer;
+            count += EPContainer::from(ROLLOVER_COUNT.load(Ordering::Relaxed))
+                * EPContainer::from(u32::MAX);
         }
 
         // convert count and return the instant
