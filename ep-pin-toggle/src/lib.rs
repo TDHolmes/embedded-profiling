@@ -28,7 +28,7 @@
 //! ### `proc-macros`
 //!
 //! enables the `proc-macros` feature in [`embedded-profiling`](embedded_profiling). Enables
-//! the [`embedded_profiling::profile_function`] procedural macro.
+//! the [`macro@embedded_profiling::profile_function`] procedural macro.
 #![cfg_attr(not(test), no_std)]
 
 use core::cell::RefCell;

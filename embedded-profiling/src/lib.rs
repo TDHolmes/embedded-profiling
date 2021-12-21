@@ -50,7 +50,7 @@
 //! ### `proc-macros`
 //!
 //! enables the `proc-macros` feature in [`embedded-profiling`](self). Enables
-//! the [`embedded_profiling::profile_function`](self::profile_function) procedural macro.
+//! the [`macro@embedded_profiling::profile_function`](self::profile_function) procedural macro.
 //!
 #![warn(missing_docs)]
 #![cfg_attr(not(test), no_std)]
