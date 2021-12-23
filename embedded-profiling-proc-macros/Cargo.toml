@@ -7,6 +7,7 @@ repository = "https://github.com/TDHolmes/embedded-profiling"
 keywords = ["performance", "profiling", "no-std"]
 categories = ["development-tools::profiling"]
 license = "MIT OR Apache-2.0"
+rust-version = "1.57"
 
 [dependencies]
 quote = { version = "1.0", default-features = false }

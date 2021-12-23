@@ -52,6 +52,10 @@ A working example program on a [`feather_m4`] development board is provided
 in the [`embedded-profiling` github repo](https://github.com/TDHolmes/embedded-profiling).
 These examples use some libraries implementing this trait, [`ep-systick`], [`ep-dwt`], and [`ep-pin-toggle`].
 
+## Minimum Supported Rust Version (MSRV)
+
+This crate is guaranteed to compile on stable Rust 1.57 and up. It might compile with older versions but that may change in any new patch release.
+
 ## License
 
 This code is licensed under either of:

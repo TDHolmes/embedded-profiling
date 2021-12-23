@@ -30,6 +30,11 @@ jobs:
     - name: Checkout Sources
       uses: actions/checkout@v2
 
+    - name: Verify MSRV
+      run: |
+        cargo install cargo-msrv
+        cargo msrv --bisect --path ./embedded-profiling -- cargo check --workspace --exclude embedded-profiling-examples
+
     - name: Build (default)
       run: RUSTFLAGS="-D warnings" cargo build
 
