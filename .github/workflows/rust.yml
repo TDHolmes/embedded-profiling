@@ -23,7 +23,7 @@ jobs:
         toolchain: nightly
         override: true
         target: thumbv7em-none-eabihf
-        components: clippy
+        components: clippy, rustfmt
 
     - name: Checkout Sources
       uses: actions/checkout@v2
