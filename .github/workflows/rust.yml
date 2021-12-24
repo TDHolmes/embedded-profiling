@@ -14,8 +14,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    env:
-      CARGO_BUILD_TARGET: thumbv7em-none-eabihf
 
     steps:
     - name: Install Rust (thumbv7em)
@@ -34,7 +32,6 @@ jobs:
       uses: actions-rs/install@v0.1
       with:
         crate: cargo-msrv
-        version: latest
         use-tool-cache: true
 
     - name: Verify MSRV
@@ -45,16 +42,29 @@ jobs:
         cargo msrv --verify --path ./ep-systick -- cargo check
         cargo msrv --verify --path ./ep-dwt -- cargo check
 
+    - name: Check Formatting
+      run: cargo fmt --check
+
     - name: Build (default)
-      run: RUSTFLAGS="-D warnings" cargo build
+      env:
+        CARGO_BUILD_TARGET: thumbv7em-none-eabihf
+        RUSTFLAGS: -D warnings
+      run: cargo build
 
     - name: Build (all features)
-      run: RUSTFLAGS="-D warnings" cargo build --all-features
+      env:
+        CARGO_BUILD_TARGET: thumbv7em-none-eabihf
+        RUSTFLAGS: -D warnings
+      run: cargo build --all-features
 
     - name: test all crates
-      run: unset CARGO_BUILD_TARGET && RUSTFLAGS="-D warnings" cargo test --exclude embedded-profiling-examples --workspace
+      env:
+        RUSTFLAGS: -D warnings
+      run: cargo test --exclude embedded-profiling-examples --workspace
 
     - name: Clippy
+      env:
+        CARGO_BUILD_TARGET: thumbv7em-none-eabihf
       uses: actions-rs/clippy-check@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
