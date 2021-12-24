@@ -30,10 +30,20 @@ jobs:
     - name: Checkout Sources
       uses: actions/checkout@v2
 
+    - name: install cargo-msrv
+      uses: actions-rs/install@v0.1
+      with:
+        crate: cargo-msrv
+        version: latest
+        use-tool-cache: true
+
     - name: Verify MSRV
       run: |
-        unset CARGO_BUILD_TARGET && cargo install cargo-msrv
-        cargo msrv --verify --path ./embedded-profiling -- cargo check --workspace --exclude embedded-profiling-examples
+        cargo msrv --verify --path ./embedded-profiling -- cargo check
+        cargo msrv --verify --path ./embedded-profiling-proc-macros -- cargo check
+        cargo msrv --verify --path ./ep-pin-toggle -- cargo check
+        cargo msrv --verify --path ./ep-systick -- cargo check
+        cargo msrv --verify --path ./ep-dwt -- cargo check
 
     - name: Build (default)
       run: RUSTFLAGS="-D warnings" cargo build
