@@ -36,11 +36,11 @@ jobs:
 
     - name: Verify MSRV
       run: |
-        cargo msrv --verify --path ./embedded-profiling -- cargo check
-        cargo msrv --verify --path ./embedded-profiling-proc-macros -- cargo check
-        cargo msrv --verify --path ./ep-pin-toggle -- cargo check
-        cargo msrv --verify --path ./ep-systick -- cargo check
-        cargo msrv --verify --path ./ep-dwt -- cargo check
+        cargo msrv --verify --path ./embedded-profiling --output-format json -- cargo check | grep "\"success\":true"
+        cargo msrv --verify --path ./embedded-profiling-proc-macros --output-format json -- cargo check | grep "\"success\":true"
+        cargo msrv --verify --path ./ep-pin-toggle --output-format json -- cargo check | grep "\"success\":true"
+        cargo msrv --verify --path ./ep-systick --output-format json -- cargo check | grep "\"success\":true"
+        cargo msrv --verify --path ./ep-dwt --output-format json -- cargo check | grep "\"success\":true"
 
     - name: Check Formatting
       run: cargo fmt --check
