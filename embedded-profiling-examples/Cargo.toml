@@ -6,6 +6,7 @@ description = "examples for `embedded-profiling`"
 repository = "https://github.com/TDHolmes/embedded-profiling"
 keywords = ["performance", "profiling", "no-std"]
 license = "MIT OR Apache-2.0"
+rust-version = "1.57"
 categories = ["development-tools::profiling"]
 readme = "# Embedded Profiling Examples"
 

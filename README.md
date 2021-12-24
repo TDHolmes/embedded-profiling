@@ -3,6 +3,10 @@
 Solution to profiling the runtime of functions in embedded, `no-std` environments.
 [Documentation](https://docs.rs/embedded-profiling/)
 
+## Minimum Supported Rust Version (MSRV)
+
+This crate is guaranteed to compile on stable Rust 1.57 and up. It might compile with older versions but that may change in any new patch release.
+
 ## License
 
 This code is licensed under either of:

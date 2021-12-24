@@ -14,8 +14,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    env:
-      CARGO_BUILD_TARGET: thumbv7em-none-eabihf
 
     steps:
     - name: Install Rust (thumbv7em)
@@ -25,21 +23,48 @@ jobs:
         toolchain: nightly
         override: true
         target: thumbv7em-none-eabihf
-        components: clippy
+        components: clippy, rustfmt
 
     - name: Checkout Sources
       uses: actions/checkout@v2
 
+    - name: install cargo-msrv
+      uses: actions-rs/install@v0.1
+      with:
+        crate: cargo-msrv
+        use-tool-cache: true
+
+    - name: Verify MSRV
+      run: |
+        cargo msrv --verify --path ./embedded-profiling --output-format json -- cargo check | grep "\"success\":true"
+        cargo msrv --verify --path ./embedded-profiling-proc-macros --output-format json -- cargo check | grep "\"success\":true"
+        cargo msrv --verify --path ./ep-pin-toggle --output-format json -- cargo check | grep "\"success\":true"
+        cargo msrv --verify --path ./ep-systick --output-format json -- cargo check | grep "\"success\":true"
+        cargo msrv --verify --path ./ep-dwt --output-format json -- cargo check | grep "\"success\":true"
+
+    - name: Check Formatting
+      run: cargo fmt --check
+
     - name: Build (default)
-      run: RUSTFLAGS="-D warnings" cargo build
+      env:
+        CARGO_BUILD_TARGET: thumbv7em-none-eabihf
+        RUSTFLAGS: -D warnings
+      run: cargo build
 
     - name: Build (all features)
-      run: RUSTFLAGS="-D warnings" cargo build --all-features
+      env:
+        CARGO_BUILD_TARGET: thumbv7em-none-eabihf
+        RUSTFLAGS: -D warnings
+      run: cargo build --all-features
 
     - name: test all crates
-      run: unset CARGO_BUILD_TARGET && RUSTFLAGS="-D warnings" cargo test --exclude embedded-profiling-examples --workspace
+      env:
+        RUSTFLAGS: -D warnings
+      run: cargo test --exclude embedded-profiling-examples --workspace
 
     - name: Clippy
+      env:
+        CARGO_BUILD_TARGET: thumbv7em-none-eabihf
       uses: actions-rs/clippy-check@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
