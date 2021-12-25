@@ -9,7 +9,7 @@ categories = ["development-tools::profiling", "embedded"]
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-fugit = { path = "../../fugit", version = "0.3" }
+fugit = ">=0.3.3"
 embedded-profiling-proc-macros = { path = "../embedded-profiling-proc-macros", version = "0.2", optional = true }
 
 [dev-dependencies]
