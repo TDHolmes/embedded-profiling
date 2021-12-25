@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 rust-version = "1.57"
 
 [dependencies]
-embedded-profiling = {version = "0.2", path = "../embedded-profiling"}
+embedded-profiling = {version = "^0.3", path = "../embedded-profiling"}
 embedded-hal = "0.2"
 
 [dev-dependencies]
