@@ -1,6 +1,6 @@
 [package]
 name = "ep-pin-toggle"
-version = "0.1.5"
+version = "0.2.0"
 edition = "2021"
 description = "`embedded-profiling` implementation using a GPIO toggle"
 repository = "https://github.com/TDHolmes/embedded-profiling"
