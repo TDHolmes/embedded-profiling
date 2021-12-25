@@ -128,16 +128,3 @@ use cortex_m_rt::exception;
 fn SysTick() {
     ROLLOVER_COUNT.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn check_reduced_fraction() {
-        const FREQ: u32 = 120_000_000;
-        let (num, den) = SysTickProfiler::<FREQ>::reduced_fraction();
-        assert_eq!(1, num);
-        assert_eq!(120, den);
-    }
-}

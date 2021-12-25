@@ -126,16 +126,3 @@ impl<const FREQ: u32> EmbeddedProfiler for DwtProfiler<FREQ> {
 fn DebugMonitor() {
     ROLLOVER_COUNT.fetch_add(1, Ordering::Relaxed);
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn check_reduced_fraction() {
-        const FREQ: u32 = 120_000_000;
-        let (num, den) = DwtProfiler::<FREQ>::reduced_fraction();
-        assert_eq!(1, num);
-        assert_eq!(120, den);
-    }
-}

@@ -125,13 +125,15 @@ pub trait EmbeddedProfiler {
     /// takes the starting snapshot of a specific trace.
     ///
     /// ```
-    /// # struct my_profiler;
-    /// # impl EmbeddedProfiler for my_profiler { fn read_clock(&self) -> EPInstant {EPInstant::from_ticks(0)} }
+    /// # use embedded_profiling::*;
+    /// # struct MyProfiler;
+    /// # impl EmbeddedProfiler for MyProfiler { fn read_clock(&self) -> EPInstant {EPInstant::from_ticks(0)} }
+    /// # let my_profiler = MyProfiler;
     /// # fn function_to_profile() {}
     /// let start_time = my_profiler.start_snapshot();
     /// function_to_profile();
     /// if let Some(snapshot) = my_profiler.end_snapshot(start_time, "function_to_profile") {
-    ///     my_profiler.log_snapshot(snapshot);
+    ///     my_profiler.log_snapshot(&snapshot);
     /// }
     /// ```
     fn start_snapshot(&self) -> EPInstant {
@@ -424,5 +426,16 @@ mod test {
         assert_eq!(read_clock_at, 1, "'read_clock' called at wrong time");
         assert_eq!(at_end_at, 2, "'at_end' called at wrong time");
         assert_eq!(log_snapshot_at, 3, "'log_snapshot' called at wrong time");
+    }
+
+    #[test]
+    const fn check_conversion() {
+        // check to see if the conversion is naive and saturates or not
+        const NOM: u32 = 4;
+        const DENOM: u32 = 4_000_000;
+        const INITIAL_INSTANT: EPInstantGeneric<NOM, DENOM> =
+            EPInstantGeneric::from_ticks(EPContainer::MAX - 10);
+        const RESULT_INSTANT: EPInstant = convert_instant(INITIAL_INSTANT);
+        assert!(RESULT_INSTANT.ticks() == INITIAL_INSTANT.ticks());
     }
 }
