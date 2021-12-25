@@ -71,21 +71,26 @@ type PrivContainer = u32;
 type PrivContainer = u64;
 
 /// The underlying container of our [`Duration`](fugit::Duration)/[`Instant`](fugit::Instant) types.
-/// Can be either `u32` or `u64`, depending on features. (default: `u32`)
+/// Can be either `u32` or `u64`, depending on features (default: `u32`).
 pub type EPContainer = PrivContainer;
 
-/// Our [`Duration`](fugit::Duration) type, representing time elapsed in microseconds
+/// Our [`Duration`](fugit::Duration) type, representing time elapsed in microseconds.
 pub type EPDuration = fugit::MicrosDuration<EPContainer>;
 
 /// Our [`Instant`](fugit::Instant) type, representing a snapshot in time from
-/// a clock with 1 µs precision (or at least, converted to this representation)
+/// a clock with 1 µs precision (or at least, converted to this representation).
 pub type EPInstant = fugit::Instant<EPContainer, 1, 1_000_000>;
 
-/// A recorded snapshot
+/// An [`Instant`](fugit::Instant) type but with a generic fraction. This needs to be
+/// converted into [`EPInstant`] for use in the [`EmbeddedProfiler::read_clock`] function.
+pub type EPInstantGeneric<const NOM: u32, const DENOM: u32> =
+    fugit::Instant<EPContainer, NOM, DENOM>;
+
+/// A recorded snapshot.
 pub struct EPSnapshot {
-    /// The name of this trace
+    /// The name of this trace.
     pub name: &'static str,
-    /// The duration of this trace
+    /// The duration of this trace.
     pub duration: EPDuration,
 }
 
@@ -99,34 +104,68 @@ impl core::fmt::Display for EPSnapshot {
 /// to output our results, if desired. You can also implement functions that
 /// get called when a snapshot starts and ends.
 pub trait EmbeddedProfiler {
-    /// Takes a reading from the clock
+    /// Takes a reading from the clock.
+    ///
+    /// Used by the underlying trait methods [`EmbeddedProfiler::start_snapshot`] and
+    /// [`EmbeddedProfiler::end_snapshot`].
     fn read_clock(&self) -> EPInstant;
 
-    /// Optionally log the snapshot to some output, like a serial port
+    /// Optionally log the snapshot to some output, like a serial port.
     fn log_snapshot(&self, _snapshot: &EPSnapshot) {}
 
     /// Optional function that gets called at the start of the snapshot recording.
+    ///
     /// If one would want to very simple profiling, they could use `at_start` and `at_end`
     /// to simply toggle a GPIO.
     fn at_start(&self) {}
 
-    /// Optional function that gets called at the end of the snapshot recording
+    /// Optional function that gets called at the end of the snapshot recording.
     fn at_end(&self) {}
 
-    /// takes the starting snapshot of a specific trace
+    /// takes the starting snapshot of a specific trace.
+    ///
+    /// ```
+    /// # use embedded_profiling::*;
+    /// # struct MyProfiler;
+    /// # impl EmbeddedProfiler for MyProfiler { fn read_clock(&self) -> EPInstant {EPInstant::from_ticks(0)} }
+    /// # let my_profiler = MyProfiler;
+    /// # fn function_to_profile() {}
+    /// let start_time = my_profiler.start_snapshot();
+    /// function_to_profile();
+    /// if let Some(snapshot) = my_profiler.end_snapshot(start_time, "function_to_profile") {
+    ///     my_profiler.log_snapshot(&snapshot);
+    /// }
+    /// ```
     fn start_snapshot(&self) -> EPInstant {
         self.at_start();
         self.read_clock()
     }
 
-    /// computes the duration of the snapshot given the start time, if there hasn't been overflow
-    ///
+    /// computes the duration of the snapshot given the start time, if there hasn't been overflow.
     fn end_snapshot(&self, start: EPInstant, name: &'static str) -> Option<EPSnapshot> {
         self.at_end();
         let now = self.read_clock();
         now.checked_duration_since(start)
             .map(|duration| EPSnapshot { name, duration })
     }
+}
+
+/// Converts an instant of an unknown fraction `NOM`/`DENOM` to our microsecond representation.
+///
+/// This function is useful when implementing [`EmbeddedProfiler::read_clock`], to convert from
+/// your clocks native resolution to the 1µs resolution it needs.
+/// ```
+/// # use embedded_profiling::*;
+/// let my_clock_instant = EPInstantGeneric::<1, 1_000>::from_ticks(100);
+/// let converted_instant = convert_instant::<1, 1_000>(my_clock_instant);
+/// assert_eq!(100_000, converted_instant.ticks());
+/// ```
+#[inline]
+pub const fn convert_instant<const NOM: u32, const DENOM: u32>(
+    now: EPInstantGeneric<NOM, DENOM>,
+) -> EPInstant {
+    let us: fugit::MicrosDuration<EPContainer> = now.duration_since_epoch().convert();
+    EPInstant::from_ticks(us.ticks())
 }
 
 struct NoopProfiler;
@@ -185,7 +224,7 @@ pub unsafe fn set_profiler(
     }
 }
 
-/// Returns a reference to the configured profiler
+/// Returns a reference to the configured profiler.
 ///
 /// If a profiler hasn't yet been set by [`set_profiler`], the no-op profiler
 /// will be returned. Generally, you should use one of the other provided
@@ -206,7 +245,7 @@ pub fn profiler() -> &'static dyn EmbeddedProfiler {
     }
 }
 
-/// takes the starting snapshot of a specific trace
+/// takes the starting snapshot of a specific trace.
 ///
 /// ```
 /// let start = embedded_profiling::start_snapshot();
@@ -219,13 +258,13 @@ pub fn start_snapshot() -> EPInstant {
 }
 
 /// computes the duration of the snapshot given the start time using the
-/// globally configured profiler
+/// globally configured profiler.
 #[inline]
 pub fn end_snapshot(start: EPInstant, name: &'static str) -> Option<EPSnapshot> {
     profiler().end_snapshot(start, name)
 }
 
-/// Logs the given snapshot with the globally configured profiler
+/// Logs the given snapshot with the globally configured profiler.
 ///
 /// ```
 /// let start = embedded_profiling::start_snapshot();
@@ -387,5 +426,16 @@ mod test {
         assert_eq!(read_clock_at, 1, "'read_clock' called at wrong time");
         assert_eq!(at_end_at, 2, "'at_end' called at wrong time");
         assert_eq!(log_snapshot_at, 3, "'log_snapshot' called at wrong time");
+    }
+
+    #[test]
+    const fn check_conversion() {
+        // check to see if the conversion is naive and saturates or not
+        const NOM: u32 = 4;
+        const DENOM: u32 = 4_000_000;
+        const INITIAL_INSTANT: EPInstantGeneric<NOM, DENOM> =
+            EPInstantGeneric::from_ticks(EPContainer::MAX - 10);
+        const RESULT_INSTANT: EPInstant = convert_instant(INITIAL_INSTANT);
+        assert!(RESULT_INSTANT.ticks() == INITIAL_INSTANT.ticks());
     }
 }

@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 rust-version = "1.57"
 
 [dependencies]
-fugit = "0.3"
+fugit = ">=0.3.3,<0.4"
 embedded-profiling-proc-macros = { path = "../embedded-profiling-proc-macros", version = "0.2", optional = true }
 
 [dev-dependencies]

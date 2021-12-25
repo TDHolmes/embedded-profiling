@@ -48,7 +48,7 @@
 //! [`embedded_profiling::profile_function`]: https://docs.rs/embedded-profiling/latest/embedded_profiling/attr.profile_function.html
 #![cfg_attr(not(test), no_std)]
 
-use embedded_profiling::{EPContainer, EPInstant, EPSnapshot, EmbeddedProfiler};
+use embedded_profiling::{EPContainer, EPInstant, EPInstantGeneric, EPSnapshot, EmbeddedProfiler};
 
 use cortex_m::peripheral::{DCB, DWT};
 
@@ -98,12 +98,6 @@ impl<const FREQ: u32> DwtProfiler<FREQ> {
 
         Self { dwt }
     }
-
-    /// Reduce the fraction we need to convert between 1µs precision and whatever our core clock is running at
-    pub(crate) const fn reduced_fraction() -> (EPContainer, EPContainer) {
-        let gcd = gcd::binary_u64(1_000_000_u64, FREQ as u64) as EPContainer;
-        (1_000_000 / gcd, FREQ as EPContainer / gcd)
-    }
 }
 
 impl<const FREQ: u32> EmbeddedProfiler for DwtProfiler<FREQ> {
@@ -118,8 +112,7 @@ impl<const FREQ: u32> EmbeddedProfiler for DwtProfiler<FREQ> {
         }
 
         // convert count and return the instant
-        let (red_num, red_denom) = Self::reduced_fraction();
-        EPInstant::from_ticks(count * red_num / red_denom)
+        embedded_profiling::convert_instant(EPInstantGeneric::<1, FREQ>::from_ticks(count))
     }
 
     fn log_snapshot(&self, snapshot: &EPSnapshot) {
@@ -132,17 +125,4 @@ impl<const FREQ: u32> EmbeddedProfiler for DwtProfiler<FREQ> {
 #[allow(non_snake_case)]
 fn DebugMonitor() {
     ROLLOVER_COUNT.fetch_add(1, Ordering::Relaxed);
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn check_reduced_fraction() {
-        const FREQ: u32 = 120_000_000;
-        let (num, den) = DwtProfiler::<FREQ>::reduced_fraction();
-        assert_eq!(1, num);
-        assert_eq!(120, den);
-    }
 }
