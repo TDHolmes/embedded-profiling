@@ -50,6 +50,7 @@ jobs:
       with:
         profile: minimal
         toolchain: nightly
+        override: true
         target: thumbv7em-none-eabihf
 
     - name: Checkout Sources
@@ -79,6 +80,9 @@ jobs:
         override: true
         target: thumbv7em-none-eabihf
         components: clippy, rustfmt
+
+    - name: Checkout Sources
+      uses: actions/checkout@v2
 
     - name: Check Formatting
       run: cargo fmt --check
