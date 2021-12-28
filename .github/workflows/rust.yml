@@ -34,9 +34,9 @@ jobs:
           - ~/.cargo/registry/index/
           - ~/.cargo/registry/cache/
           - ~/.cargo/git/db/
-        key: ${{ runner.OS }}-cargo-msrv-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.OS }}-cargo-msrv-2-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.OS }}-cargo-msrv-
+          ${{ runner.OS }}-cargo-msrv-2-
 
     - name: install cargo-msrv
       uses: actions-rs/install@v0.1
@@ -79,9 +79,9 @@ jobs:
           - ~/.cargo/registry/index/
           - ~/.cargo/registry/cache/
           - ~/.cargo/git/db/
-        key: ${{ runner.OS }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.OS }}-cargo-build-2-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.OS }}-cargo-build-
+          ${{ runner.OS }}-cargo-build-2-
 
     - name: Cache Build Output Dependencies
       uses: actions/cache@v2
@@ -121,9 +121,9 @@ jobs:
           - ~/.cargo/registry/index/
           - ~/.cargo/registry/cache/
           - ~/.cargo/git/db/
-        key: ${{ runner.OS }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.OS }}-cargo-test-2-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.OS }}-cargo-test-
+          ${{ runner.OS }}-cargo-test-2-
 
     - name: Cache Build Output Dependencies
       uses: actions/cache@v2
