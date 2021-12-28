@@ -36,7 +36,7 @@ jobs:
           - ~/.cargo/git/db/
         key: ${{ runner.OS }}-cargo-msrv-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.OS }}-cargo-msrv
+          ${{ runner.OS }}-cargo-msrv-
 
     - name: install cargo-msrv
       uses: actions-rs/install@v0.1
@@ -81,7 +81,7 @@ jobs:
           - ~/.cargo/git/db/
         key: ${{ runner.OS }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.OS }}-cargo-build
+          ${{ runner.OS }}-cargo-build-
 
     - name: Cache Build Output Dependencies
       uses: actions/cache@v2
@@ -123,7 +123,7 @@ jobs:
           - ~/.cargo/git/db/
         key: ${{ runner.OS }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.OS }}-cargo-test
+          ${{ runner.OS }}-cargo-test-
 
     - name: Cache Build Output Dependencies
       uses: actions/cache@v2
@@ -131,7 +131,7 @@ jobs:
         path: target
         key: ${{ runner.OS }}-test-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.OS }}-test
+          ${{ runner.OS }}-test-
 
     - name: Check Formatting
       run: cargo fmt --check
