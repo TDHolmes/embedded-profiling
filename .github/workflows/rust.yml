@@ -39,10 +39,9 @@ jobs:
           ${{ runner.OS }}-cargo-msrv-2-
 
     - name: install cargo-msrv
-      uses: actions-rs/install@v0.1
-      with:
-        crate: cargo-msrv
-        use-tool-cache: true
+      run: |
+        cargo install cargo-msrv --debug
+        find ~/.cargo/bin/
 
     - name: Verify MSRV
       run: |
