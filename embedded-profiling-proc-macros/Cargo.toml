@@ -1,7 +1,7 @@
 [package]
 name = "embedded-profiling-proc-macros"
 description = "Procedural macros for the `embedded-profiling` library"
-version = "0.2.1"
+version = "0.2.0"
 edition = "2021"
 repository = "https://github.com/TDHolmes/embedded-profiling"
 keywords = ["performance", "profiling", "no-std"]
@@ -11,7 +11,7 @@ rust-version = "1.57"
 
 [dependencies]
 quote = { version = "1.0", default-features = false }
-syn = { version = "1.0", features = ["proc-macro"], default-features = false }
+syn = { version = "1.0", features = ["full"] }
 
 [dev-dependencies]
 embedded-profiling = { path = "../embedded-profiling", version = "^0.3", features = ["proc-macros"] }
