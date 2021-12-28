@@ -71,6 +71,18 @@ jobs:
     - name: Checkout Sources
       uses: actions/checkout@v2
 
+    - name: Cache Cargo Dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          - ~/.cargo/bin/
+          - ~/.cargo/registry/index/
+          - ~/.cargo/registry/cache/
+          - ~/.cargo/git/db/
+        key: ${{ runner.OS }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.OS }}-cargo-build
+
     - name: Cache Build Output Dependencies
       uses: actions/cache@v2
       with:
@@ -100,6 +112,18 @@ jobs:
 
     - name: Checkout Sources
       uses: actions/checkout@v2
+
+    - name: Cache Cargo Dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          - ~/.cargo/bin/
+          - ~/.cargo/registry/index/
+          - ~/.cargo/registry/cache/
+          - ~/.cargo/git/db/
+        key: ${{ runner.OS }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.OS }}-cargo-test
 
     - name: Cache Build Output Dependencies
       uses: actions/cache@v2
