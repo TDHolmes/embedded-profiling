@@ -34,17 +34,9 @@ jobs:
           - ~/.cargo/registry/index/
           - ~/.cargo/registry/cache/
           - ~/.cargo/git/db/
-        key: ${{ runner.OS }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.OS }}-cargo-msrv-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.OS }}-cargo-
-
-    - name: Cache Build Output Dependencies
-      uses: actions/cache@v2
-      with:
-        path: target
-        key: ${{ runner.OS }}-build-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.OS }}-build-
+          ${{ runner.OS }}-cargo-msrv
 
     - name: install cargo-msrv
       uses: actions-rs/install@v0.1
@@ -79,18 +71,6 @@ jobs:
     - name: Checkout Sources
       uses: actions/checkout@v2
 
-    - name: Cache Cargo Dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          - ~/.cargo/bin/
-          - ~/.cargo/registry/index/
-          - ~/.cargo/registry/cache/
-          - ~/.cargo/git/db/
-        key: ${{ runner.OS }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.OS }}-cargo-
-
     - name: Cache Build Output Dependencies
       uses: actions/cache@v2
       with:
@@ -121,25 +101,13 @@ jobs:
     - name: Checkout Sources
       uses: actions/checkout@v2
 
-    - name: Cache Cargo Dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          - ~/.cargo/bin/
-          - ~/.cargo/registry/index/
-          - ~/.cargo/registry/cache/
-          - ~/.cargo/git/db/
-        key: ${{ runner.OS }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.OS }}-cargo-
-
     - name: Cache Build Output Dependencies
       uses: actions/cache@v2
       with:
         path: target
-        key: ${{ runner.OS }}-build-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.OS }}-test-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.OS }}-build-
+          ${{ runner.OS }}-test
 
     - name: Check Formatting
       run: cargo fmt --check
