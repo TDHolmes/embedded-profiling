@@ -5,7 +5,7 @@ edition = "2021"
 description = "`embedded-profiling` implementation using systick"
 repository = "https://github.com/TDHolmes/embedded-profiling"
 keywords = ["performance", "profiling", "no-std"]
-categories = ["development-tools::profiling", "embedded"]
+categories = ["development-tools::profiling", "embedded", "no-std"]
 license = "MIT OR Apache-2.0"
 rust-version = "1.57"
 
