@@ -108,6 +108,7 @@ pub trait EmbeddedProfiler {
     ///
     /// Used by the underlying trait methods [`EmbeddedProfiler::start_snapshot`] and
     /// [`EmbeddedProfiler::end_snapshot`].
+    #[must_use]
     fn read_clock(&self) -> EPInstant;
 
     /// Optionally log the snapshot to some output, like a serial port.
@@ -136,12 +137,14 @@ pub trait EmbeddedProfiler {
     ///     my_profiler.log_snapshot(&snapshot);
     /// }
     /// ```
+    #[allow(clippy::must_use_candidate)]
     fn start_snapshot(&self) -> EPInstant {
         self.at_start();
         self.read_clock()
     }
 
     /// computes the duration of the snapshot given the start time, if there hasn't been overflow.
+    #[allow(clippy::must_use_candidate)]
     fn end_snapshot(&self, start: EPInstant, name: &'static str) -> Option<EPSnapshot> {
         self.at_end();
         let now = self.read_clock();
@@ -161,6 +164,7 @@ pub trait EmbeddedProfiler {
 /// assert_eq!(100_000, converted_instant.ticks());
 /// ```
 #[inline]
+#[must_use]
 pub const fn convert_instant<const NOM: u32, const DENOM: u32>(
     now: EPInstantGeneric<NOM, DENOM>,
 ) -> EPInstant {
@@ -236,6 +240,7 @@ pub unsafe fn set_profiler(
 /// let snapshot = embedded_profiling::profiler().end_snapshot(start, "doc-example");
 /// ```
 #[inline]
+#[must_use]
 pub fn profiler() -> &'static dyn EmbeddedProfiler {
     if STATE.load(Ordering::Acquire) == INITIALIZED {
         unsafe { PROFILER }
@@ -253,6 +258,7 @@ pub fn profiler() -> &'static dyn EmbeddedProfiler {
 /// let snapshot = embedded_profiling::end_snapshot(start, "doc-example");
 /// ```
 #[inline]
+#[allow(clippy::must_use_candidate)]
 pub fn start_snapshot() -> EPInstant {
     profiler().start_snapshot()
 }
@@ -260,6 +266,7 @@ pub fn start_snapshot() -> EPInstant {
 /// computes the duration of the snapshot given the start time using the
 /// globally configured profiler.
 #[inline]
+#[allow(clippy::must_use_candidate)]
 pub fn end_snapshot(start: EPInstant, name: &'static str) -> Option<EPSnapshot> {
     profiler().end_snapshot(start, name)
 }

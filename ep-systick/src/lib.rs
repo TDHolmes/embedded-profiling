@@ -78,6 +78,7 @@ impl<const FREQ: u32> SysTickProfiler<FREQ> {
     ///
     /// # Panics
     /// asserts that the compile time constant `FREQ` matches the runtime provided `sysclk`
+    #[must_use]
     pub fn new(mut systick: SYST, sysclk: u32) -> Self {
         assert!(FREQ == sysclk);
 
