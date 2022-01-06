@@ -63,6 +63,9 @@ static ROLLOVER_COUNT: AtomicU32 = AtomicU32::new(0);
 
 /// The reload value of the [`systick`](cortex_m::peripheral::SYST) peripheral. Also is the max it can go (2**24).
 const SYSTICK_RELOAD: u32 = 0x00FF_FFFF;
+/// the resolution of [`systick`](cortex_m::peripheral::SYST), 2**24
+#[cfg(feature = "extended")]
+const SYSTICK_RESOLUTION: EPContainer = 0x0100_0000;
 
 /// [`systick`](cortex_m::peripheral::SYST) implementation of [`EmbeddedProfiler`].
 ///
@@ -103,9 +106,6 @@ impl<const FREQ: u32> EmbeddedProfiler for SysTickProfiler<FREQ> {
         let count = {
             #[cfg(feature = "extended")]
             {
-                /// the resolution of [`systick`](cortex_m::peripheral::SYST), 2**24
-                const SYSTICK_RESOLUTION: EPContainer = 16_777_216;
-
                 // read the clock & ROLLOVER_COUNT. We read `SYST` twice because we need to detect
                 // if we've rolled over, and if we have make sure we have the right value for ROLLOVER_COUNT.
                 let first = SYST::get_current();
