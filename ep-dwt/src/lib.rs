@@ -80,6 +80,7 @@ impl<const FREQ: u32> DwtProfiler<FREQ> {
     ///
     /// # Panics
     /// asserts that the compile time constant `FREQ` matches the runtime provided `sysclk`
+    #[must_use]
     pub fn new(dcb: &mut DCB, mut dwt: DWT, sysclk: u32) -> Self {
         assert!(FREQ == sysclk);
 

@@ -1,150 +1,147 @@
-
 name: Rust
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   msrv:
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install Rust (thumbv7em)
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: nightly
-        target: thumbv7em-none-eabihf
+      - name: Install Rust (thumbv7em)
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          target: thumbv7em-none-eabihf
 
-    - name: Checkout Sources
-      uses: actions/checkout@v2
+      - name: Checkout Sources
+        uses: actions/checkout@v2
 
-    - name: Cache Cargo Dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          - ~/.cargo/bin/
-          - ~/.cargo/registry/index/
-          - ~/.cargo/registry/cache/
-          - ~/.cargo/git/db/
-        key: ${{ runner.OS }}-cargo-msrv-2-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.OS }}-cargo-msrv-2-
+      - name: Cache Cargo Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            - ~/.cargo/bin/
+            - ~/.cargo/registry/index/
+            - ~/.cargo/registry/cache/
+            - ~/.cargo/git/db/
+          key: ${{ runner.OS }}-cargo-msrv-2-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-cargo-msrv-2-
 
-    - name: install cargo-msrv
-      run: |
-        cargo install cargo-msrv --debug
-        find ~/.cargo/bin/
+      - name: install cargo-msrv
+        run: |
+          cargo install cargo-msrv --debug
+          find ~/.cargo/bin/
 
-    - name: Verify MSRV
-      run: |
-        cargo msrv --verify --path ./embedded-profiling -- cargo check
-        cargo msrv --verify --path ./embedded-profiling-proc-macros -- cargo check
-        cargo msrv --verify --path ./ep-pin-toggle -- cargo check
-        cargo msrv --verify --path ./ep-systick -- cargo check
-        cargo msrv --verify --path ./ep-dwt -- cargo check
+      - name: Verify MSRV
+        run: |
+          cargo msrv --verify --path ./embedded-profiling -- cargo check
+          cargo msrv --verify --path ./embedded-profiling-proc-macros -- cargo check
+          cargo msrv --verify --path ./ep-pin-toggle -- cargo check
+          cargo msrv --verify --path ./ep-systick -- cargo check
+          cargo msrv --verify --path ./ep-dwt -- cargo check
 
   build:
-
     runs-on: ubuntu-latest
     env:
       CARGO_BUILD_TARGET: thumbv7em-none-eabihf
       RUSTFLAGS: -D warnings
 
     steps:
-    - name: Install Rust (thumbv7em)
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: nightly
-        override: true
-        target: thumbv7em-none-eabihf
+      - name: Install Rust (thumbv7em)
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+          target: thumbv7em-none-eabihf
 
-    - name: Checkout Sources
-      uses: actions/checkout@v2
+      - name: Checkout Sources
+        uses: actions/checkout@v2
 
-    - name: Cache Cargo Dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          - ~/.cargo/bin/
-          - ~/.cargo/registry/index/
-          - ~/.cargo/registry/cache/
-          - ~/.cargo/git/db/
-        key: ${{ runner.OS }}-cargo-build-2-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.OS }}-cargo-build-2-
+      - name: Cache Cargo Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            - ~/.cargo/bin/
+            - ~/.cargo/registry/index/
+            - ~/.cargo/registry/cache/
+            - ~/.cargo/git/db/
+          key: ${{ runner.OS }}-cargo-build-2-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-cargo-build-2-
 
-    - name: Cache Build Output Dependencies
-      uses: actions/cache@v2
-      with:
-        path: target
-        key: ${{ runner.OS }}-build-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.OS }}-build-
+      - name: Cache Build Output Dependencies
+        uses: actions/cache@v2
+        with:
+          path: target
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-
 
-    - name: Build (default)
-      run: cargo build
+      - name: Build (default)
+        run: cargo build
 
-    - name: Build (all features)
-      run: cargo build --all-features
+      - name: Build (all features)
+        run: cargo build --all-features
 
   test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install Rust (thumbv7em)
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: nightly
-        override: true
-        target: thumbv7em-none-eabihf
-        components: clippy, rustfmt
+      - name: Install Rust (thumbv7em)
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+          target: thumbv7em-none-eabihf
+          components: clippy, rustfmt
 
-    - name: Checkout Sources
-      uses: actions/checkout@v2
+      - name: Checkout Sources
+        uses: actions/checkout@v2
 
-    - name: Cache Cargo Dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          - ~/.cargo/bin/
-          - ~/.cargo/registry/index/
-          - ~/.cargo/registry/cache/
-          - ~/.cargo/git/db/
-        key: ${{ runner.OS }}-cargo-test-2-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.OS }}-cargo-test-2-
+      - name: Cache Cargo Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            - ~/.cargo/bin/
+            - ~/.cargo/registry/index/
+            - ~/.cargo/registry/cache/
+            - ~/.cargo/git/db/
+          key: ${{ runner.OS }}-cargo-test-2-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-cargo-test-2-
 
-    - name: Cache Build Output Dependencies
-      uses: actions/cache@v2
-      with:
-        path: target
-        key: ${{ runner.OS }}-test-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.OS }}-test-
+      - name: Cache Build Output Dependencies
+        uses: actions/cache@v2
+        with:
+          path: target
+          key: ${{ runner.OS }}-test-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-test-
 
-    - name: Check Formatting
-      run: cargo fmt --check
+      - name: Check Formatting
+        run: cargo fmt --check
 
-    - name: test all crates
-      env:
-        RUSTFLAGS: -D warnings
-      run: cargo test --exclude embedded-profiling-examples --workspace
+      - name: test all crates
+        env:
+          RUSTFLAGS: -D warnings
+        run: cargo test --exclude embedded-profiling-examples --workspace
 
-    - name: Clippy
-      env:
-        CARGO_BUILD_TARGET: thumbv7em-none-eabihf
-      uses: actions-rs/clippy-check@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: embedded-profiling Clippy
-        args: --all-features -- -W clippy::pedantic -W clippy::nursery -W clippy::cargo -A clippy::must_use_candidate
+      - name: Clippy
+        env:
+          CARGO_BUILD_TARGET: thumbv7em-none-eabihf
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: embedded-profiling Clippy
+          args: --all-features -- -W clippy::pedantic -W clippy::nursery -W clippy::cargo
