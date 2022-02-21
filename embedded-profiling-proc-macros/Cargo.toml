@@ -15,7 +15,7 @@ syn = { version = "1.0", features = ["full"] }
 
 [dev-dependencies]
 embedded-profiling = { path = "../embedded-profiling", version = "^0.3", features = ["proc-macros"] }
-serial_test = "0.5"
+serial_test = "0.6"
 
 [lib]
 proc-macro=true
