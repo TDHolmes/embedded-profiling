@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Cache Cargo Dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             - ~/.cargo/bin/
@@ -68,7 +68,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Cache Cargo Dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             - ~/.cargo/bin/
@@ -80,7 +80,7 @@ jobs:
             ${{ runner.OS }}-cargo-build-2-
 
       - name: Cache Build Output Dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: target
           key: ${{ runner.OS }}-build-${{ hashFiles('**/Cargo.lock') }}
@@ -110,7 +110,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Cache Cargo Dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             - ~/.cargo/bin/
@@ -122,7 +122,7 @@ jobs:
             ${{ runner.OS }}-cargo-test-2-
 
       - name: Cache Build Output Dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: target
           key: ${{ runner.OS }}-test-${{ hashFiles('**/Cargo.lock') }}
