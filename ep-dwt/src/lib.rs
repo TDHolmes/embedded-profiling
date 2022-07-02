@@ -90,6 +90,10 @@ impl<const FREQ: u32> DwtProfiler<FREQ> {
     ///
     /// # Panics
     /// asserts that the compile time constant `FREQ` matches the runtime provided `sysclk`
+    ///
+    /// # Errors
+    /// If the [`DWT`] doesn't have a cycle counter or configuration of it fails, we can return
+    /// an error.
     pub fn new(dcb: &mut DCB, mut dwt: DWT, sysclk: u32) -> Result<Self, DwtProfilerError> {
         assert!(FREQ == sysclk);
 
@@ -116,7 +120,7 @@ impl<const FREQ: u32> DwtProfiler<FREQ> {
                     emit: EmitOption::WatchpointDebugEvent,
                     compare: 4_294_967_295, // just before overflow (2**32 - 1)
                 }))
-                .map_err(|_conf_err| DwtProfilerError::CycleCounterInvalidSettings)?
+                .map_err(|_conf_err| DwtProfilerError::CycleCounterInvalidSettings)?;
         }
 
         Ok(Self { dwt })
