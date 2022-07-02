@@ -13,3 +13,6 @@ codegen-units = 1
 debug = true
 lto = true
 opt-level = 'z'
+
+[patch.crates-io]
+cortex-m = { git = 'https://github.com/TDHolmes/cortex-m', package = 'cortex-m', branch = 'comparator-changes-only' }
