@@ -183,7 +183,7 @@ macro_rules! serial_write {
     ($($tt:tt)+) => {{
         use core::fmt::Write;
 
-        crate::usb_serial::get(|usbserial| { core::write!(usbserial, $($tt)*).unwrap() });
+        $crate::usb_serial::get(|usbserial| { core::write!(usbserial, $($tt)*).unwrap() });
     }};
 }
 
