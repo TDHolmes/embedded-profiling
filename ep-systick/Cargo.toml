@@ -1,6 +1,6 @@
 [package]
 name = "ep-systick"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 description = "`embedded-profiling` implementation using systick"
 repository = "https://github.com/TDHolmes/embedded-profiling"
