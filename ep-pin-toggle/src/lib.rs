@@ -51,7 +51,7 @@ where
 {
     /// Creates a new [`EPPinToggle`] with the given `pin`.
     #[must_use]
-    pub fn new(pin: P) -> Self {
+    pub const fn new(pin: P) -> Self {
         Self {
             pin: RefCell::new(pin),
         }
