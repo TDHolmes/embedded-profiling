@@ -14,7 +14,7 @@ fugit = ">=0.3.3,<0.4"
 embedded-profiling-proc-macros = { path = "../embedded-profiling-proc-macros", version = "0.2", optional = true }
 
 [dev-dependencies]
-serial_test = "0.8"
+serial_test = "0.9"
 
 [features]
 default = []
