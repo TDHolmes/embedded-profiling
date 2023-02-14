@@ -20,7 +20,7 @@
 //! let mut core = CorePeripherals::take().unwrap();
 //! // (...)
 //! let dwt_profiler = cortex_m::singleton!(: ep_dwt::DwtProfiler::<CORE_FREQ> =
-//!     ep_dwt::DwtProfiler::<CORE_FREQ>::new(&mut core.DCB, core.DWT, CORE_FREQ))
+//!     ep_dwt::DwtProfiler::<CORE_FREQ>::new(&mut core.DCB, core.DWT, CORE_FREQ).unwrap())
 //! .unwrap();
 //! unsafe {
 //!     embedded_profiling::set_profiler(dwt_profiler).unwrap();
@@ -65,6 +65,16 @@ static ROLLOVER_COUNT: AtomicU32 = AtomicU32::new(0);
 // For extended mode to work, we really need a u64 container. Double check this.
 static_assertions::assert_type_eq_all!(EPContainer, u64);
 
+#[derive(Debug)]
+/// Things that can go wrong when configuring the [`DWT`] hardware
+pub enum DwtProfilerError {
+    /// [`cortex_m::peripheral::DWT::has_cycle_counter()`] reported that this hardware
+    /// does not support cycle count hardware
+    CycleCounterUnsupported,
+    /// We failed to configure cycle count compare for the `extended` feature
+    CycleCounterInvalidSettings,
+}
+
 /// DWT trace unit implementing [`EmbeddedProfiler`].
 ///
 /// The frequency of the [`DWT`] is encoded using the parameter `FREQ`.
@@ -80,37 +90,77 @@ impl<const FREQ: u32> DwtProfiler<FREQ> {
     ///
     /// # Panics
     /// asserts that the compile time constant `FREQ` matches the runtime provided `sysclk`
-    #[must_use]
-    pub fn new(dcb: &mut DCB, mut dwt: DWT, sysclk: u32) -> Self {
+    ///
+    /// # Errors
+    /// If the [`DWT`] doesn't have a cycle counter or configuration of it fails, we can return
+    /// an error.
+    pub fn new(dcb: &mut DCB, mut dwt: DWT, sysclk: u32) -> Result<Self, DwtProfilerError> {
         assert!(FREQ == sysclk);
+
+        // check if our HW supports it
+        if !dwt.has_cycle_counter() {
+            return Err(DwtProfilerError::CycleCounterUnsupported);
+        }
 
         // Enable the DWT block
         dcb.enable_trace();
-        #[cfg(feature = "extended")]
-        // Enable DebugMonitor exceptions to fire to track overflows
-        unsafe {
-            dcb.demcr.modify(|f| f | 1 << 16);
-        }
         DWT::unlock();
 
         // reset cycle count and enable it to run
         unsafe { dwt.cyccnt.write(0) };
         dwt.enable_cycle_counter();
 
-        Self { dwt }
+        if cfg!(feature = "extended") {
+            use cortex_m::peripheral::dwt::{ComparatorFunction, CycleCountSettings, EmitOption};
+
+            // Enable DebugMonitor exceptions to fire to track overflows
+            dcb.enable_debug_monitor();
+            dwt.comp0
+                .configure(ComparatorFunction::CycleCount(CycleCountSettings {
+                    emit: EmitOption::WatchpointDebugEvent,
+                    compare: 4_294_967_295, // just before overflow (2**32 - 1)
+                }))
+                .map_err(|_conf_err| DwtProfilerError::CycleCounterInvalidSettings)?;
+        }
+
+        Ok(Self { dwt })
     }
 }
 
 impl<const FREQ: u32> EmbeddedProfiler for DwtProfiler<FREQ> {
     fn read_clock(&self) -> EPInstant {
         // get the cycle count and add the rollover if we're extended
-        #[allow(unused_mut)]
-        let mut count = EPContainer::from(self.dwt.cyccnt.read());
-        #[cfg(feature = "extended")]
-        {
-            count += EPContainer::from(ROLLOVER_COUNT.load(Ordering::Relaxed))
-                * EPContainer::from(u32::MAX);
-        }
+        let count: EPContainer = {
+            #[cfg(feature = "extended")]
+            {
+                /// Every time we roll over, we should add 2**32
+                const ROLLOVER_AMOUNT: EPContainer = 0x1_0000_0000;
+
+                // read the clock & ROLLOVER_COUNT. We read `cyccnt` twice because we need to detect
+                // if we've rolled over, and if we have make sure we have the right value for ROLLOVER_COUNT.
+                let first = self.dwt.cyccnt.read();
+                let rollover: EPContainer = ROLLOVER_COUNT.load(Ordering::Acquire).into();
+                let second = self.dwt.cyccnt.read();
+
+                if first < second {
+                    // The usual case. We did not roll over between the first and second reading,
+                    // and because of that we also know we got a valid read on ROLLOVER_COUNT.
+                    rollover * ROLLOVER_AMOUNT + EPContainer::from(first)
+                } else {
+                    // we rolled over sometime between the first and second read. We may or may not have
+                    // caught the right ROLLOVER_COUNT, so grab that again and then use the second reading.
+                    let rollover: EPContainer = ROLLOVER_COUNT.load(Ordering::Acquire).into();
+
+                    rollover * ROLLOVER_AMOUNT + EPContainer::from(second)
+                }
+            }
+
+            #[cfg(not(feature = "extended"))]
+            {
+                // We aren't trying to be fancy here, we don't care if this rolled over from the last read.
+                EPContainer::from(self.dwt.cyccnt.read())
+            }
+        };
 
         // convert count and return the instant
         embedded_profiling::convert_instant(EPInstantGeneric::<1, FREQ>::from_ticks(count))
@@ -125,5 +175,5 @@ impl<const FREQ: u32> EmbeddedProfiler for DwtProfiler<FREQ> {
 #[exception]
 #[allow(non_snake_case)]
 fn DebugMonitor() {
-    ROLLOVER_COUNT.fetch_add(1, Ordering::Relaxed);
+    ROLLOVER_COUNT.fetch_add(1, Ordering::Release);
 }

@@ -31,7 +31,7 @@ default = ["panic_persist"]
 usb = ["usb-device", "usbd-serial"]
 panic_persist = ["panic-persist"]
 panic_halt = ["panic-halt"]
-extended = ["ep-systick/extended", "embedded-profiling/container-u64"]
+extended = ["ep-systick/extended", "ep-dwt/extended", "embedded-profiling/container-u64"]
 
 [[bin]]
 name = "delay_usb_dwt"
